@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXUS AI Transport</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--ink:#16150F;--slip:#DDE0D4;--paper:#EFF0E9;--plate:#F5C518;
+      --oxide:#9E3B1E;--moss:#3F5D2E;--amber:#B87A16;--mute:#6C6F62;--rule:#B9BDAE}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--slip);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;line-height:1.45;padding-bottom:56px}
+.num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header{border-bottom:2px solid var(--ink);padding:24px 0 15px;margin-bottom:20px}
+.eyebrow{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:700}
+h1{font-size:clamp(27px,6.6vw,44px);font-weight:900;line-height:.97;letter-spacing:-.02em;margin:8px 0 10px}
+.thesis{font-size:14.5px;max-width:54ch;color:#2C2B22}
+h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:900;
+   padding-bottom:6px;border-bottom:1px solid var(--ink);margin:0 0 4px}
+.sub{font-size:12.5px;color:var(--mute);margin-bottom:13px}
+.panel{background:var(--paper);border:2px solid var(--ink);padding:17px;margin-bottom:18px}
+.grid{display:grid;gap:11px;grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:470px){.grid,.g3{grid-template-columns:repeat(2,1fr)}}
+label{display:block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--mute);margin-bottom:4px}
+label i{font-style:normal;color:var(--rule);text-transform:none;letter-spacing:0}
+input,select{width:100%;font-family:'IBM Plex Mono',monospace;font-weight:600;
+  border:1px solid var(--rule);background:#fff;color:var(--ink);border-radius:0;padding:9px 10px;font-size:18px}
+select{font-family:'Archivo',sans-serif;font-size:15px}
+input:focus,select:focus{outline:2px solid var(--ink);outline-offset:1px}
+.rs{position:relative}
+.rs::before{content:'₹';position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--mute);font-size:16px;pointer-events:none}
+.rs input{padding-left:24px}
+td .rs::before{left:6px;font-size:13px} td .rs input{padding-left:18px}
+.brandrow{display:flex;align-items:center;gap:13px}
+.mark{width:44px;height:44px;background:var(--ink);color:var(--plate);display:grid;place-items:center;
+  font-weight:900;font-size:24px;line-height:1;flex:none}
+.brand{font-size:clamp(24px,5.6vw,34px);font-weight:900;letter-spacing:-.02em;line-height:1}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:18px}
+.seg button{font-family:inherit;text-align:left;padding:14px 15px;cursor:pointer;
+  border:2px solid var(--ink);background:var(--paper);color:var(--ink)}
+.seg button+button{border-left:0}
+.seg button b{display:block;font-size:14.5px;font-weight:900;line-height:1.2}
+.seg button span{display:block;font-size:11.5px;color:var(--mute);margin-top:3px}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--slip)}
+.seg button[aria-pressed=true] span{color:#B9BDAE}
+.truckbar{display:flex;align-items:center;gap:11px;justify-content:space-between;
+  border:2px solid var(--ink);background:var(--plate);padding:11px 14px;margin-bottom:12px}
+.tsum{font-family:'Archivo',sans-serif;font-size:15px;font-weight:900}
+.truckbar button{font-family:'Archivo',sans-serif;font-size:12px;font-weight:900;background:var(--ink);
+  color:var(--slip);border:0;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.crossbar{display:flex;align-items:center;gap:13px;justify-content:space-between;flex-wrap:wrap;
+  border:2px dashed var(--ink);padding:13px 15px;margin-bottom:20px;font-size:13.5px}
+.crossbar button{font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:900;background:var(--ink);
+  color:var(--slip);border:0;padding:10px 14px;cursor:pointer}
+.tabs{display:flex;margin-bottom:18px}
+.tabs.sub button{font-size:13px;padding:11px 6px}
+.tabs{flex-wrap:wrap}
+.tabs button{flex:1;min-width:130px;font-family:inherit;font-weight:900;font-size:13.5px;padding:12px 6px;
+  border:2px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+.tabs button+button{border-left:0}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--slip)}
+.answer{margin-top:17px;border-top:2px solid var(--ink);padding-top:16px}
+.tag{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--mute);margin-bottom:7px}
+.plate{display:inline-block;background:var(--plate);border:2px solid var(--ink);
+  padding:11px 17px;font-weight:900;font-size:clamp(26px,6.6vw,40px);line-height:1}
+.cmp{margin-top:12px;font-size:14.5px;font-weight:600}
+.cmp .big{font-size:16px}.cmp b{font-weight:900}
+.work{font-size:12.5px;margin-top:15px;max-width:330px}
+.work div{display:flex;justify-content:space-between;gap:14px;padding:2.5px 0}
+.work .rule{border-top:1px solid var(--ink);margin-top:5px;padding-top:5px;font-weight:700}
+.drop{border:2px dashed var(--ink);background:#fff;padding:15px;text-align:center;margin-bottom:10px}
+.drop b{display:block;font-size:15px;font-weight:900}
+.drop span{display:block;font-size:12px;color:var(--mute);margin-top:3px}
+.drop input[type=file]{display:block;margin:10px auto 0;font-family:'Archivo',sans-serif;font-size:13px;
+  font-weight:600;border:1px solid var(--rule);background:var(--paper);padding:8px;max-width:320px}
+.ocr{margin-top:10px;font-size:12.5px;font-weight:700;padding:9px;border:1px solid var(--rule);background:var(--paper)}
+.ocr.err{border-color:var(--oxide);color:var(--oxide)}
+.mapper{border:1px solid var(--rule);background:#fff;padding:13px;margin-bottom:12px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+.btnrow button{font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:700;background:var(--ink);
+  color:var(--slip);border:0;padding:10px 13px;cursor:pointer}
+.btnrow button:active{background:var(--oxide)}
+.tally{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+.chip{border:2px solid var(--ink);padding:7px 12px;font-weight:900;font-size:13px}
+.chip.g{background:var(--moss);color:#F0F2E6;border-color:var(--moss)}
+.chip.a{background:var(--plate)}
+.chip.r{background:var(--oxide);color:#F4EFE6;border-color:var(--oxide)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--mute);font-weight:700;
+   text-align:right;padding:0 7px 7px;border-bottom:1px solid var(--ink);white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:6px 7px;border-bottom:1px solid var(--rule);text-align:right;
+   font-family:'IBM Plex Mono',monospace;white-space:nowrap}
+td:first-child{text-align:left}
+td input{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;padding:6px 7px;
+  border:1px solid var(--rule);background:#fff;width:86px;text-align:right}
+td input.dest{font-family:'Archivo',sans-serif;text-align:left;width:130px;font-weight:700}
+td.del button{background:none;border:0;color:var(--mute);font-size:17px;cursor:pointer;padding:0 5px;font-weight:700}
+tr.g td:first-child{box-shadow:inset 4px 0 0 var(--moss)}
+tr.a td:first-child{box-shadow:inset 4px 0 0 var(--amber)}
+tr.r td:first-child{box-shadow:inset 4px 0 0 var(--oxide)}
+.verd{font-family:'Archivo',sans-serif;font-weight:900;font-size:11.5px}
+.g .verd{color:var(--moss)} .a .verd{color:var(--amber)} .r .verd{color:var(--oxide)}
+.helpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px;margin-top:13px}
+.helpgrid a{display:block;border:2px solid var(--ink);background:var(--paper);padding:13px 11px;
+  text-decoration:none;color:var(--ink);font-weight:700;font-size:13.5px}
+.helpgrid a:active{background:var(--plate)}
+.helpgrid a span{display:block;font-weight:500;font-size:11.5px;color:var(--mute);margin-top:2px}
+.helpcall{border:2px solid var(--ink);background:#fff;padding:15px}
+.helpcall b{font-size:14.5px} .helpcall p{font-size:12.5px;color:var(--mute);margin-top:3px}
+.alertcard{border:2px solid var(--ink);background:#fff;max-width:390px}
+.alertcard .ah{background:var(--ink);color:var(--slip);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;font-weight:700;padding:7px 12px}
+.alertcard .ab{padding:13px 12px;font-size:14px;line-height:1.5}
+.alertcard .af{border-top:1px solid var(--rule);padding:9px 12px;font-size:11.5px;
+  font-weight:900;letter-spacing:.06em;color:var(--oxide)}
+.helpbox{border:1px solid var(--rule);background:#fff;padding:14px;margin:16px 0}
+.helpbox h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;margin-bottom:5px}
+.helpbox p{font-size:12.5px;color:var(--mute);margin-bottom:10px}
+.hrow{display:flex;gap:7px;flex-wrap:wrap}
+.hrow button{font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:700;background:var(--paper);
+  color:var(--ink);border:1.5px solid var(--ink);padding:9px 12px;cursor:pointer}
+.hrow button:active{background:var(--plate)}
+.hmsg{font-size:12.5px;color:var(--mute);margin-top:9px;min-height:1em}
+.callbox{border-top:1px solid var(--rule);margin-top:13px;padding-top:12px;font-size:13px}
+.callbox b{font-weight:900}
+.extbtn{font-family:'Archivo',sans-serif;font-size:11.5px;font-weight:900;background:var(--oxide);
+  color:#F4EFE6;border:0;padding:7px 11px;cursor:pointer;white-space:nowrap}
+.extbox{border:2px solid var(--ink);background:#fff;padding:15px;margin:14px 0}
+.extbox h4{font-size:13px;font-weight:900;margin-bottom:9px}
+.extbox ol{margin:9px 0 0 17px;font-size:13px;line-height:1.75}
+.extbox .big{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;
+  background:var(--plate);padding:7px 11px;display:inline-block;margin:4px 0}
+.extbox .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.extbox .row button,.extbox .row a{font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:700;
+  background:var(--ink);color:var(--slip);border:0;padding:10px 13px;cursor:pointer;text-decoration:none;display:inline-block}
+.addbtn{font-family:'Archivo',sans-serif;font-size:13px;font-weight:700;background:var(--ink);
+  color:var(--slip);border:0;padding:11px 16px;cursor:pointer;white-space:nowrap}
+.dnext{margin:16px 0 13px;padding:11px 13px;background:var(--plate);border:2px solid var(--ink);
+  font-weight:700;font-size:14.5px}
+.dnext.clear{background:var(--paper);font-weight:600;color:var(--mute)}
+.dcell{font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+.dcell b{display:block;font-family:'Archivo',sans-serif;font-size:11px;font-weight:900;letter-spacing:.04em}
+.dok b{color:var(--moss)} .dsoon b{color:var(--amber)} .dgone b{color:var(--oxide)}
+tr.dgone td:first-child{box-shadow:inset 4px 0 0 var(--oxide)}
+tr.dsoon td:first-child{box-shadow:inset 4px 0 0 var(--amber)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+details{margin-top:15px;border-top:1px solid var(--rule);padding-top:13px}
+summary{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--mute);cursor:pointer}
+details input{font-size:16px}
+.ctitle{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:var(--ink);
+  margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--rule)}
+.derived{margin-top:14px;padding:10px 12px;background:var(--slip);border-left:3px solid var(--ink);font-size:12.5px}
+.derived b{font-weight:700}
+.hints{font-size:12px;color:var(--mute);margin-top:11px;max-width:76ch;line-height:1.5}
+footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding-top:12px;max-width:64ch}
+</style>
+</head>
+<body><div class="wrap">
+
+<header>
+  <div class="brandrow">
+    <div class="mark">N</div>
+    <div>
+      <div class="brand">NEXUS AI <span style="font-weight:500">Transport</span></div>
+      <div class="eyebrow">Freight economics and compliance</div>
+    </div>
+  </div>
+</header>
+
+<div class="panel" id="truckPanel" hidden>
+  <h2>Set your truck once</h2>
+  <p class="sub">These stay put. Average matters most — every vehicle runs differently.</p>
+  <div class="grid g3">
+    <div><label for="cfg">Truck</label><select id="cfg"></select></div>
+    <div><label for="ton">Tonnes</label><input class="num" id="ton" type="number" step="0.5"></div>
+    <div><label for="mil">Average <i>km/L</i></label><input class="num" id="mil" type="number" step="0.05"></div>
+  </div>
+  <details>
+    <summary>Your costs — asked the way you actually pay them</summary>
+    <p class="hints" style="margin:11px 0 0">Nobody knows their servicing in rupees per kilometre. Put in the bill and how long it lasts; the per-km figure works itself out.</p>
+
+    <div class="ctitle">Fuel</div>
+    <div class="grid">
+      <div><label for="fuel">Diesel per litre</label><div class="rs"><input class="num" id="fuel" type="number" step="1" value="99"></div></div>
+      <div><label for="defpc">DEF as % of diesel <i>0 for BS4</i></label><input class="num" id="defpc" type="number" step="0.5" value="4"></div>
+    </div>
+
+    <div class="ctitle">Tyres</div>
+    <div class="grid">
+      <div><label for="tyC">One tyre costs</label><div class="rs"><input class="num" id="tyC" type="number" step="500"></div></div>
+      <div><label for="tyN">How many tyres</label><input class="num" id="tyN" type="number" step="1"></div>
+      <div><label for="tyL">A tyre lasts <i>km</i></label><input class="num" id="tyL" type="number" step="5000" value="90000"></div>
+    </div>
+
+    <div class="ctitle">Service and repairs</div>
+    <div class="grid">
+      <div><label for="svcC">One service costs</label><div class="rs"><input class="num" id="svcC" type="number" step="500"></div></div>
+      <div><label for="svcK">Service every <i>km</i></label><input class="num" id="svcK" type="number" step="1000" value="15000"></div>
+      <div><label for="rep">Repairs in a month</label><div class="rs"><input class="num" id="rep" type="number" step="500"></div></div>
+    </div>
+
+    <div class="ctitle">Every trip</div>
+    <div class="grid">
+      <div><label for="drv">Driver and advance</label><div class="rs"><input class="num" id="drv" type="number" step="100"></div></div>
+      <div><label for="toll">Toll per km</label><div class="rs"><input class="num" id="toll" type="number" step="0.5"></div></div>
+      <div><label for="tollback">Toll reimbursed <i>1 yes, 0 no</i></label><input class="num" id="tollback" type="number" step="1" min="0" max="1" value="0"></div>
+    </div>
+
+    <div class="ctitle">Paid whether the truck moves or not</div>
+    <div class="grid">
+      <div><label for="emi">EMI in a month</label><div class="rs"><input class="num" id="emi" type="number" step="1000"></div></div>
+      <div><label for="ins">Insurance in a year</label><div class="rs"><input class="num" id="ins" type="number" step="1000"></div></div>
+      <div><label for="per">Permit, tax, fitness a year</label><div class="rs"><input class="num" id="per" type="number" step="1000"></div></div>
+      <div><label for="oth">Office and administrative a month <i>zero if you do it yourself</i></label><div class="rs"><input class="num" id="oth" type="number" step="500" value="0"></div></div>
+      <div><label for="run">Days you run in a month</label><input class="num" id="run" type="number" step="1" value="26"></div>
+      <div><label for="spd">Km you cover in a day</label><input class="num" id="spd" type="number" step="10" value="250"></div>
+    </div>
+    <div class="derived num" id="derived"></div>
+  </details>
+  <div class="btnrow" style="margin:15px 0 0"><button type="button" id="tDone">Done</button></div>
+</div>
+
+<div class="seg">
+  <button id="sRate" aria-pressed="true"><b>What should this pay?</b><span>Work out a rate</span></button>
+  <button id="sComp" aria-pressed="false"><b>Papers and deadlines</b><span>Nothing expires on you</span></button>
+</div>
+
+<div id="segRate">
+  <div class="truckbar"><div class="tsum" id="tSum">Insert your truck details</div><button type="button" id="tEdit">Enter</button></div>
+  <div class="tabs sub">
+    <button id="tOne" aria-pressed="true">One trip</button>
+    <button id="tMany" aria-pressed="false">Whole contract</button>
+  </div>
+</div>
+
+<div id="segComp" hidden>
+  <div class="tabs sub">
+    <button id="tDoc2" aria-pressed="true">Loading papers</button>
+    <button id="tEwb" aria-pressed="false">E-way bills</button>
+    <button id="tDoc" aria-pressed="false">Vehicle papers</button>
+    <button id="tHelp" aria-pressed="false">Help nearby</button>
+  </div>
+</div>
+
+<!-- ONE TRIP -->
+<div class="panel" id="paneOne">
+  <h2>One trip</h2>
+  <p class="sub">Lead is one way — the empty return is added. Days is door to door, including time standing at the gate.</p>
+  <div class="grid g3">
+    <div><label for="lead">Lead km <i>one way</i></label><input class="num" id="lead" type="number" step="10" value="201"></div>
+    <div><label for="days">Days to complete the trip</label><input class="num" id="days" type="number" step="0.5" min="0.5" value="2.5"></div>
+    <div><label for="rate">Rate offered <i>blank if none</i></label><div class="rs"><input class="num" id="rate" type="number" step="10" placeholder="—"></div></div>
+  </div>
+  <div class="answer">
+    <div class="tag">Profitable rate</div>
+    <div class="plate" id="plate">—</div>
+    <div class="cmp" id="cmp"></div>
+    <div class="work num" id="work"></div>
+  </div>
+</div>
+
+<!-- WHOLE CONTRACT -->
+<div class="panel" id="paneMany" hidden>
+  <h2>Whole contract</h2>
+  <p class="sub">Paste your destination, your km and your rate. You get the rate to negotiate on.</p>
+
+  <div class="drop">
+    <b>Bring in the freight list</b>
+    <span>Excel or CSV — most of the columns don't matter, you'll pick the three that do</span>
+    <input type="file" id="file" accept=".xlsx,.xls,.csv,.tsv,.txt">
+  </div>
+  <div class="drop">
+    <b>Or photograph it</b>
+    <span>A printed sheet or a screenshot</span>
+    <input type="file" id="photo" accept="image/*" capture="environment">
+    <div id="ocr" class="ocr" hidden></div>
+  </div>
+  <div id="mapper" class="mapper" hidden>
+    <div class="grid g3">
+      <div><label for="cDest">Destination</label><select id="cDest"></select></div>
+      <div><label for="cLead">Km</label><select id="cLead"></select></div>
+      <div><label for="cRate">Rate</label><select id="cRate"></select></div>
+    </div>
+    <p class="hints" id="mapnote"></p>
+  </div>
+  <div class="btnrow">
+    <button type="button" id="demo">Load an example</button>
+    <button type="button" id="pasteBtn">Paste</button>
+    <button type="button" id="addBtn">+ Add row</button>
+    <button type="button" id="clearBtn">Clear</button>
+  </div>
+
+  <div class="tally" id="tally"></div>
+  <div class="scroll"><table>
+    <thead><tr>
+      <th>Destination</th><th>Km</th><th>Rate ₹/T</th><th>Days</th>
+      <th>Cost/km</th><th>Ask ₹/T</th><th>Per trip</th><th>Verdict</th><th></th>
+    </tr></thead><tbody id="rows"></tbody>
+  </table></div>
+  <p class="hints" id="summary"></p>
+</div>
+
+<!-- PAPERS -->
+<div class="panel" id="paneDoc" hidden>
+  <h2>Papers</h2>
+  <p class="sub">Insurance, fitness, PUC, permit. Put the dates in once and it tells you before they run out.</p>
+
+  <div class="grid" style="grid-template-columns:1.1fr 1fr 1fr 1fr 1fr auto;align-items:end">
+    <div><label for="dVeh">Vehicle number</label><input id="dVeh" placeholder="MP13H1070" style="font-size:16px"></div>
+    <div><label for="dIns">Insurance</label><input class="num" id="dIns" type="date"></div>
+    <div><label for="dFit">Fitness</label><input class="num" id="dFit" type="date"></div>
+    <div><label for="dPuc">PUC</label><input class="num" id="dPuc" type="date"></div>
+    <div><label for="dPer">Permit / tax</label><input class="num" id="dPer" type="date"></div>
+    <div><button type="button" id="dAdd" class="addbtn">Add</button></div>
+  </div>
+
+  <div id="dNext" class="dnext"></div>
+  <div class="scroll"><table id="dTable" hidden>
+    <thead><tr><th>Vehicle</th><th>Insurance</th><th>Fitness</th><th>PUC</th><th>Permit / tax</th><th></th></tr></thead>
+    <tbody id="dRows"></tbody>
+  </table></div>
+  <div class="helpbox">
+    <h4>Help nearby</h4>
+    <p>Uses your phone's location to open the map at whatever you need.</p>
+    <div class="hrow">
+      <button type="button" data-q="RTO office">RTO</button>
+      <button type="button" data-q="vehicle insurance office">Insurance</button>
+      <button type="button" data-q="PUC pollution testing centre">PUC centre</button>
+      <button type="button" data-q="truck mechanic workshop">Mechanic</button>
+      <button type="button" data-q="tyre shop truck">Tyre shop</button>
+      <button type="button" data-q="petrol diesel pump">Fuel</button>
+    </div>
+    <div id="helpMsg" class="hmsg"></div>
+  </div>
+  <p class="hints">Red is expired, amber is inside a month. Once this is on a server it will message you a month out and again a week before — that is the part that needs a backend.</p>
+</div>
+
+<!-- E-WAY BILLS -->
+<div class="panel" id="paneEwb" hidden>
+  <h2>E-way bills</h2>
+  <p class="sub">Validity can only be extended from 8 hours before expiry to 8 hours after. Miss it and it is ₹10,000 or the tax evaded, whichever is higher — and the truck can be held.</p>
+
+  <div class="grid" style="grid-template-columns:1.3fr 1fr 1.2fr 1.3fr auto;align-items:end">
+    <div><label for="eNo">EWB number</label><input id="eNo" placeholder="651649850079" style="font-size:16px"></div>
+    <div><label for="eVeh">Vehicle</label><input id="eVeh" placeholder="MP13H1070" style="font-size:16px"></div>
+    <div><label for="eTo">Going to</label><input id="eTo" placeholder="Guna" style="font-size:16px"></div>
+    <div><label for="eExp">Expires</label><input class="num" id="eExp" type="datetime-local"></div>
+    <div><label for="eKm">Lead km</label><input class="num" id="eKm" type="number" step="10" placeholder="—"></div>
+    <div><button type="button" id="eAdd" class="addbtn">Add</button></div>
+  </div>
+
+  <div id="eNext" class="dnext"></div>
+  <div class="scroll"><table id="eTable" hidden>
+    <thead><tr><th>EWB</th><th>Vehicle</th><th>To</th><th>Expires</th><th>Left</th><th></th><th></th></tr></thead>
+    <tbody id="eRows"></tbody>
+  </table></div>
+  <div id="extBox" class="extbox" hidden></div>
+  <p class="hints">Typing these by hand defeats the point. The EWB number and its expiry are printed on the invoice handed over at loading — photograph that and every bill tracks itself. Extending still happens on the government portal — this gets you there with the number copied and the answers ready. Doing it inside the app needs licensed API access, which is a later build.</p>
+</div>
+
+<!-- DI / INVOICE -->
+<div class="panel" id="paneDI" hidden>
+  <h2>Loading papers</h2>
+  <p class="sub">Photograph the DI, the invoice or your LR at the gate. It reads the trip out, prices it, and starts the e-way bill clock.</p>
+
+  <div class="drop">
+    <b>Photograph the paper</b>
+    <span>DI, tax invoice, LR or delivery challan — photo or PDF</span>
+    <input type="file" id="diPhoto" accept="image/*,application/pdf">
+    <div class="btnrow" style="justify-content:center;margin:12px 0 0">
+      <button type="button" id="diDemo">See it with a real DI</button>
+    </div>
+    <div id="diMsg" class="ocr" hidden></div>
+  </div>
+
+  <div id="diCard" hidden>
+    <div class="scroll"><table>
+      <thead><tr><th>From</th><th>To</th><th>Tonnes</th><th>Vehicle</th><th>Despatched</th><th>EWB expiry</th></tr></thead>
+      <tbody id="diRow"></tbody>
+    </table></div>
+
+    <div class="grid g3" style="margin-top:14px">
+      <div><label for="diKm">Lead km <i>one way</i></label><input class="num" id="diKm" type="number" step="10" placeholder="—"></div>
+      <div><label for="diDays">Days to complete</label><input class="num" id="diDays" type="number" step="0.5" min="0.5" value="2"></div>
+      <div><label for="diRate">Rate offered</label><div class="rs"><input class="num" id="diRate" type="number" step="10" placeholder="—"></div></div>
+    </div>
+
+    <div class="answer">
+      <div class="tag">Profitable rate</div>
+      <div class="plate" id="diPlate">—</div>
+      <div class="cmp" id="diCmp"></div>
+    </div>
+    <div id="diShort" class="dnext" hidden></div>
+  </div>
+
+  <p class="hints">One photo fills everything the paper carries — origin, destination, tonnage, vehicle, dates and the e-way bill — and files it into the other tabs on its own. Distance is never printed on a DI, so you give it once per destination and it is remembered after that.</p>
+</div>
+
+<!-- HELP -->
+<div class="panel" id="paneHelp" hidden>
+  <h2>Help nearby</h2>
+  <p class="sub">Wherever the truck is right now. Opens your maps app with directions.</p>
+
+  <div class="btnrow"><button type="button" id="locBtn">Use my location</button></div>
+  <div id="locMsg" class="ocr" hidden></div>
+  <div class="helpgrid" id="helpGrid"></div>
+
+  <div class="ctitle">Rather someone did it for you</div>
+  <div class="helpcall">
+    <b>Get the e-way bill extended by phone</b>
+    <p>Send the bill number and where the truck is. Someone extends it and messages you back.</p>
+    <div class="grid g2" style="margin-top:11px">
+      <div><label for="hNo">Bill number</label><input id="hNo" placeholder="651649850079" style="font-size:16px"></div>
+      <div><label for="hPh">Your number</label><input id="hPh" placeholder="99930 77113" style="font-size:16px"></div>
+    </div>
+    <div class="btnrow" style="margin-top:11px"><button type="button" id="hSend">Request a call back</button></div>
+    <div id="hMsg" class="ocr" hidden></div>
+  </div>
+
+  <div class="ctitle">What the alert will look like</div>
+  <div class="alertcard">
+    <div class="ah">Truck papers</div>
+    <div class="ab"><b>MP13H1070 — e-way bill expires in 1 hour.</b><br>Guna load. Tap to extend before the window shuts.</div>
+    <div class="af">EXTEND · CALL SOMEONE · SNOOZE</div>
+  </div>
+  <p class="hints">This is a picture of the message, not a live one. Sending it needs a server holding your number and a WhatsApp or SMS channel — that is the first backend job after deployment.</p>
+</div>
+
+<div class="crossbar" id="crossBar" hidden>
+  <div id="crossText"><b>While you are here</b> — check what your next load actually has to pay.</div>
+  <button type="button" id="goRate">Work out the rate</button>
+</div>
+
+<footer>
+  Cost is fuel at your average, tyres, toll, DEF and parts per kilometre, driver and advance per trip,
+  and your fixed cost for every day the vehicle is held. The rate shown is the point at which the trip stops losing money —
+  anything above it is yours. Leave the days column blank and it estimates from your km per day.
+</footer>
+
+</div>
+<script>
+const CFG=[
+ {n:'4 tyre',  ton:2,  mil:12,  drv:700,  toll:2,   tyN:4, tyC:5000, svcC:2500, rep:2000, emi:14000, ins:16000, per:8000, oth:0},
+ {n:'6 tyre',  ton:9,  mil:7,   drv:1400, toll:3,   tyN:6, tyC:9000, svcC:4000, rep:4000, emi:26000, ins:26000, per:14000, oth:0},
+ {n:'10 tyre', ton:16, mil:4.5, drv:2400, toll:4.5, tyN:10,tyC:18000,svcC:6000, rep:7000, emi:45000, ins:42000, per:22000, oth:0},
+ {n:'12 tyre', ton:21, mil:3.8, drv:3200, toll:5.5, tyN:12,tyC:20000,svcC:7000, rep:9000, emi:58000, ins:52000, per:28000, oth:1000},
+ {n:'14 tyre', ton:31, mil:3.0, drv:4000, toll:6.5, tyN:14,tyC:22000,svcC:8000, rep:12000,emi:75000, ins:65000, per:34000, oth:1500},
+ {n:'16 tyre', ton:35, mil:2.95,drv:4300, toll:7,   tyN:16,tyC:23000,svcC:8500, rep:13000,emi:84000, ins:72000, per:38000, oth:1800},
+ {n:'18 tyre', ton:38, mil:2.9, drv:4450, toll:7,   tyN:18,tyC:24000,svcC:9000, rep:14000,emi:90000, ins:76000, per:40000, oth:2000},
+ {n:'22 tyre', ton:41, mil:2.8, drv:4550, toll:7,   tyN:22,tyC:26000,svcC:9500, rep:15000,emi:100000,ins:80000, per:44000, oth:2200},
+ {n:'More than 22 tyre', ton:60, mil:2.2, drv:6000, toll:9, tyN:26,tyC:28000,svcC:12000,rep:20000,emi:130000,ins:96000, per:56000, oth:3000},
+];
+const $=id=>document.getElementById(id);
+const money=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const v=id=>+$(id).value||0;
+
+const sel=$('cfg');
+CFG.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.n;sel.appendChild(o);});
+sel.value=7;
+function seed(){
+  const c=CFG[+sel.value];
+  $('ton').value=c.ton; $('mil').value=c.mil; $('drv').value=c.drv; $('toll').value=c.toll;
+  $('tyN').value=c.tyN; $('tyC').value=c.tyC; $('tyL').value=90000;
+  $('svcC').value=c.svcC; $('svcK').value=15000; $('rep').value=c.rep;
+  $('emi').value=c.emi; $('ins').value=c.ins; $('per').value=c.per; $('oth').value=c.oth;
+  calc();
+}
+function estDays(lead){ const s=v('spd')||250; return Math.max(0.5, Math.round((lead*2/s+1)*2)/2); }
+function rates(){
+  const fuelKm = v('mil')>0 ? v('fuel')/v('mil') : 0;
+  const defKm  = fuelKm*v('defpc')/100;
+  const tyreKm = v('tyL')>0 ? v('tyN')*v('tyC')/v('tyL') : 0;
+  const svcKm  = v('svcK')>0 ? v('svcC')/v('svcK') : 0;
+  const kmMonth= (v('run')||26)*(v('spd')||250);
+  const repKm  = kmMonth>0 ? v('rep')/kmMonth : 0;
+  const tollKm = v('tollback')?0:v('toll');
+  const fixDay = (v('emi')+v('ins')/12+v('per')/12+v('oth'))/(v('run')||26);
+  return {fuelKm,defKm,tyreKm,svcKm,repKm,tollKm,fixDay,
+          runKm: fuelKm+defKm+tyreKm+svcKm+repKm+tollKm};
+}
+function trip(lead,daysIn){
+  const km=lead*2, R=rates();
+  const days=Math.max(0.5, daysIn||estDays(lead));
+  const fuel=R.fuelKm*km, perKm=(R.runKm-R.fuelKm)*km;
+  const cost=fuel+perKm+v('drv')+days*R.fixDay;
+  return {km,days,fuel,perKm,cost,R};
+}
+function showDerived(){
+  const R=rates();
+  $('derived').innerHTML=`Works out at <b>${money(R.runKm)} a km</b> on the road
+    — fuel ${money(R.fuelKm)}, tyres ${money(R.tyreKm)}, service and repairs ${money(R.svcKm+R.repKm)},
+    DEF ${money(R.defKm)}${R.tollKm?`, toll ${money(R.tollKm)}`:''} — and
+    <b>${money(R.fixDay)} a day</b> standing still.`;
+}
+const ask=cost=>{const t=v('ton');return t>0?Math.ceil(cost/t):0;};
+
+/* ---------- one trip ---------- */
+function calcOne(){
+  const t=trip(v('lead'),v('days')), a=ask(t.cost), offered=v('rate');
+  $('plate').textContent = v('ton')>0 && v('lead')>0 ? money(a)+' / tonne' : '—';
+  const ton=v('ton');
+  $('cmp').innerHTML = (v('lead')>0&&ton>0)
+    ? `<div class="big">${money(a)} × ${ton} T = <b>${money(a*ton)}</b> for the trip</div>` +
+      (offered>0 ? (offered>=a
+        ? `<div style="color:var(--moss);margin-top:7px">Offered ${money(offered)} — ${money(offered*ton)} in, <b>${money(offered*ton-t.cost)} left over</b>.</div>`
+        : `<div style="color:var(--oxide);margin-top:7px">Offered ${money(offered)} — ${money(offered*ton)} in against ${money(t.cost)} of cost. <b>Short ${money(t.cost-offered*ton)}</b>.</div>`) : '')
+    : '';
+  $('work').innerHTML = v('lead')>0 ? `
+    <div><span>Fuel — ${t.km} km</span><span>${money(t.fuel)}</span></div>
+    <div><span>Tyres, service, DEF${t.R.tollKm?', toll':''}</span><span>${money(t.perKm)}</span></div>
+    <div><span>Driver and advance</span><span>${money(v('drv'))}</span></div>
+    <div><span>Fixed — ${t.days} days</span><span>${money(t.days*t.R.fixDay)}</span></div>
+    <div class="rule"><span>Cost of the trip</span><span>${money(t.cost)}</span></div>` : '';
+  showDerived();
+}
+
+/* ---------- whole contract ---------- */
+let ROWS=[{name:'',lead:'',rate:'',days:''}];
+function rowHTML(r,i){return `<tr data-i="${i}">
+  <td><input class="dest" data-f="name" value="${(r.name||'').replace(/"/g,'&quot;')}" placeholder="Destination"></td>
+  <td><input data-f="lead" type="number" inputmode="numeric" value="${r.lead||''}" placeholder="km"></td>
+  <td><div class="rs"><input data-f="rate" type="number" inputmode="numeric" value="${r.rate||''}" placeholder="0"></div></td>
+  <td><input data-f="days" type="number" inputmode="decimal" step="0.5" value="${r.days||''}" placeholder="${r.lead>0?estDays(r.lead):'—'}"></td><td class="c-ckm">—</td><td class="c-ask">—</td>
+  <td class="c-net">—</td><td class="verd c-verd">—</td>
+  <td class="del"><button type="button">×</button></td></tr>`;}
+function render(){
+  $('rows').innerHTML=ROWS.map(rowHTML).join('');
+  $('rows').querySelectorAll('tr').forEach(tr=>{
+    const i=+tr.dataset.i;
+    tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{
+      ROWS[i][e.target.dataset.f]=e.target.dataset.f==='name'?e.target.value:(+e.target.value||'');
+      if(e.target.dataset.f==='lead'){const d=tr.querySelector('[data-f=days]'); if(d&&!d.value) d.placeholder=estDays(ROWS[i].lead||0);}
+      scoreRow(i); tally();
+    }));
+    tr.querySelector('.del button').onclick=()=>{
+      ROWS.splice(i,1); if(!ROWS.length)ROWS=[{name:'',lead:'',rate:'',days:''}]; render();
+    };
+  });
+  tally();
+}
+function scoreRow(i){
+  const tr=$('rows').querySelector(`tr[data-i="${i}"]`); if(!tr) return null;
+  const r=ROWS[i], set=(c,t)=>{const e=tr.querySelector(c); if(e)e.textContent=t;};
+  if(!(r.lead>0&&r.rate>0&&v('ton')>0)){
+    tr.className=''; ['.c-days','.c-ckm','.c-ask','.c-net','.c-verd'].forEach(c=>set(c,'—')); return null;
+  }
+  const t=trip(r.lead,r.days), a=ask(t.cost), net=r.rate*v('ton')-t.cost;
+  const cls = r.rate>=a ? 'g' : (r.rate*v('ton')>=t.cost ? 'a' : 'r');
+  tr.className=cls;
+  set('.c-ckm',money(t.cost/t.km)); set('.c-ask',money(a));
+  const ne=tr.querySelector('.c-net');
+  ne.textContent=(net>=0?'+':'−')+money(Math.abs(net));
+  ne.style.color=net>=0?'var(--moss)':'var(--oxide)';
+  set('.c-verd', cls==='g'?'TAKE':cls==='a'?'THIN':'ASK '+money(Math.ceil(a)));
+  return {name:r.name||'This one',net,days:t.days,cls};
+}
+function tally(){
+  let g=0,a=0,r=0,n=0,best=null,worst=null;
+  ROWS.forEach((_,i)=>{const s=scoreRow(i); if(!s)return; n++;
+    s.cls==='g'?g++:s.cls==='a'?a++:r++;
+    if(!best||s.net>best.net)best=s; if(!worst||s.net<worst.net)worst=s;});
+  $('tally').innerHTML = n?`<span class="chip g">${g} take</span><span class="chip a">${a} thin</span><span class="chip r">${r} below cost</span>`:'';
+  $('summary').innerHTML = (n&&best)
+    ? `Best is <b>${best.name}</b> at ${money(best.net/best.days)} a day. Worst is <b>${worst.name}</b> — one truck there for a month costs about ${money(Math.abs(worst.net)*(26/worst.days))}.`
+    : 'Add a destination, its one-way km and the rate.';
+}
+function loadRows(list){ ROWS=list.length?list:[{name:'',lead:'',rate:'',days:''}]; render(); }
+function parseText(txt){
+  return txt.split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>{
+    const p=l.split(/[\t,;]+|\s{2,}|\s+/).filter(Boolean);
+    const nums=p.filter(x=>/^[\d.]+$/.test(x)).map(Number);
+    const name=p.filter(x=>!/^[\d.]+$/.test(x)).join(' ');
+    return nums.length>=2?{name:name||'—',lead:nums[0],rate:nums[1]}:null;
+  }).filter(Boolean);
+}
+function calc(){ calcOne(); tally(); if(document.getElementById('tSum')) truckSummary(); }
+
+/* import */
+let RAW=null;
+$('file').onchange=e=>{const f=e.target.files[0]; if(f) readFile(f);};
+function readFile(f){
+  const r=new FileReader(), csv=/\.(csv|tsv|txt)$/i.test(f.name);
+  r.onload=()=>{ try{
+    RAW = csv
+      ? r.result.split(/\r?\n/).filter(l=>l.trim()).map(l=>l.split(/\t|,/).map(c=>c.replace(/^"|"$/g,'').trim()))
+      : XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(r.result),{type:'array'}).Sheets[
+          XLSX.read(new Uint8Array(r.result),{type:'array'}).SheetNames[0]],{header:1,defval:''})
+          .filter(row=>row.some(c=>String(c).trim()));
+    buildMapper(f.name);
+  }catch(err){ alert('Could not read that file. Saving it as CSV usually works.'); } };
+  csv ? r.readAsText(f) : r.readAsArrayBuffer(f);
+}
+function buildMapper(fname){
+  if(!RAW||!RAW.length)return;
+  const w=Math.max(...RAW.map(r=>r.length)), head=RAW[0].map(c=>String(c).trim());
+  const hasHead=head.some(c=>c&&isNaN(Number(c)));
+  const opts=[]; for(let i=0;i<w;i++) opts.push(`<option value="${i}">${hasHead&&head[i]?head[i]:'Column '+(i+1)}</option>`);
+  ['cDest','cLead','cRate'].forEach(id=>$(id).innerHTML=opts.join(''));
+  const body=hasHead?RAW.slice(1):RAW, st=[];
+  for(let i=0;i<w;i++){
+    const nums=body.map(r=>String(r[i]??'').replace(/[^\d.]/g,'')).filter(x=>x!=='').map(Number).filter(n=>!isNaN(n));
+    const txt=body.filter(r=>String(r[i]??'').trim()&&isNaN(Number(String(r[i]).replace(/[^\d.]/g,'')))).length;
+    st.push({i,n:nums.length,avg:nums.length?nums.reduce((a,b)=>a+b,0)/nums.length:0,txt});
+  }
+  const d=[...st].sort((a,b)=>b.txt-a.txt)[0];
+  const nums=st.filter(s=>s.i!==d.i&&s.n>=Math.max(1,body.length*0.5)).sort((a,b)=>a.avg-b.avg);
+  $('cDest').value=d.i; if(nums.length>=2){$('cLead').value=nums[0].i;$('cRate').value=nums[1].i;}
+  $('mapper').hidden=false;
+  $('mapnote').textContent=`${fname} — ${body.length} rows. Pick the three columns that matter and ignore the rest.`;
+  applyMap();
+}
+function applyMap(){
+  if(!RAW)return;
+  const d=+$('cDest').value,l=+$('cLead').value,t=+$('cRate').value;
+  const head=RAW[0].map(c=>String(c).trim()), body=head.some(c=>c&&isNaN(Number(c)))?RAW.slice(1):RAW;
+  const num=x=>Number(String(x??'').replace(/[^\d.]/g,''));
+  loadRows(body.map(r=>{const nm=String(r[d]??'').trim(),a=num(r[l]),b=num(r[t]);
+    return (nm&&a>0&&b>0)?{name:nm,lead:a,rate:b}:null;}).filter(Boolean));
+}
+['cDest','cLead','cRate'].forEach(id=>$(id).addEventListener('change',applyMap));
+
+$('photo').onchange=async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const box=$('ocr'); box.hidden=false; box.className='ocr'; box.textContent='Reading…';
+  try{
+    const b64=await new Promise((res,rej)=>{const r=new FileReader();
+      r.onload=()=>res(r.result.split(',')[1]); r.onerror=()=>rej(); r.readAsDataURL(f);});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:f.type||'image/jpeg',data:b64}},
+        {type:'text',text:'This is a freight rate list for a trucking company. Return ONLY a JSON array, no prose or markdown, like [{"destination":"Alirajpur","lead":201,"rate":782}]. lead is the one-way distance in km, rate is the freight per tonne. Use the first rate column if several.'}]}]})});
+    const data=await resp.json();
+    const txt=(data.content||[]).map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const rows=JSON.parse(txt);
+    loadRows(rows.map(r=>({name:r.destination,lead:+r.lead||0,rate:+r.rate||0})));
+    box.textContent=rows.length+' rows read — check them below.';
+  }catch(err){ box.className='ocr err'; box.textContent='Could not read that photo here. Upload the file instead.'; }
+};
+
+$('demo').onclick=()=>loadRows(parseText(`Alirajpur, 201, 782
+Bakhatgarh, 244, 920
+Borjhar, 182, 717
+Borkundiya, 185, 724
+Chaktala, 236, 892
+Chandar Muli, 232, 880
+Chandpur, 215, 828
+Dabdi, 214, 826
+Kaththiwara, 203, 788
+Kulwat, 229, 868
+Motibadoi, 208, 805
+Nanpur, 201, 782
+Phoolmal, 236, 892
+Sondwa, 227, 861`));
+$('addBtn').onclick=()=>{ROWS.push({name:'',lead:'',rate:'',days:''});render();
+  const e=$('rows').querySelectorAll('input.dest'); e[e.length-1].focus();};
+$('clearBtn').onclick=()=>{RAW=null;$('mapper').hidden=true;$('ocr').hidden=true;loadRows([]);};
+$('pasteBtn').onclick=async()=>{ try{
+    const t=await navigator.clipboard.readText();
+    if(t&&t.trim()) loadRows(ROWS.filter(r=>r.name||r.lead).concat(parseText(t)));
+    else alert('Clipboard is empty.');
+  }catch(err){ alert('This app blocks clipboard reading. Long-press a box and choose Paste, or open the file in Chrome.'); } };
+
+/* ---------- papers ---------- */
+let VEH=[];
+const DOCS=[['ins','Insurance'],['fit','Fitness'],['puc','PUC'],['per','Permit / tax']];
+function daysTo(d){ if(!d) return null;
+  return Math.round((new Date(d+'T00:00:00') - new Date(new Date().toDateString()))/86400000); }
+function cell(d){
+  if(!d) return '<td class="dcell" style="color:var(--rule)">—</td>';
+  const n=daysTo(d), cls=n<0?'dgone':n<=30?'dsoon':'dok';
+  const when=n<0?`${-n} days ago`:n===0?'today':`${n} days`;
+  return `<td class="dcell ${cls}"><b>${n<0?'EXPIRED':when}</b>${new Date(d).toLocaleDateString('en-IN')}</td>`;
+}
+function drawDocs(){
+  const t=$('dTable');
+  if(!VEH.length){ t.hidden=true; $('dRows').innerHTML='';
+    $('dNext').className='dnext clear'; $('dNext').textContent='No vehicles yet. Add one above.'; return; }
+  t.hidden=false;
+  $('dRows').innerHTML=VEH.map((v,i)=>{
+    const ns=DOCS.map(([k])=>daysTo(v[k])).filter(n=>n!==null);
+    const worst=ns.length?Math.min(...ns):999;
+    const cls=worst<0?'dgone':worst<=30?'dsoon':'';
+    return `<tr class="${cls}"><td style="font-family:'IBM Plex Mono',monospace;font-weight:600">${v.no}</td>`
+      + DOCS.map(([k])=>cell(v[k])).join('')
+      + `<td class="del"><button type="button" data-i="${i}">×</button></td></tr>`;
+  }).join('');
+  $('dRows').querySelectorAll('.del button').forEach(b=>b.onclick=()=>{VEH.splice(+b.dataset.i,1);drawDocs();});
+
+  let soon=null;
+  VEH.forEach(v=>DOCS.forEach(([k,name])=>{
+    const n=daysTo(v[k]); if(n===null) return;
+    if(!soon||n<soon.n) soon={n,name,no:v.no};
+  }));
+  const box=$('dNext');
+  if(!soon){ box.className='dnext clear'; box.textContent='Add the dates to see what runs out first.'; }
+  else if(soon.n<0){ box.className='dnext'; box.textContent=`${soon.no} — ${soon.name} expired ${-soon.n} days ago. Renew it before the truck moves.`; }
+  else { box.className='dnext'; box.textContent=`Next up: ${soon.no} — ${soon.name} in ${soon.n} day${soon.n===1?'':'s'}.`; }
+}
+$('dAdd').onclick=()=>{
+  const no=$('dVeh').value.trim().toUpperCase();
+  if(!no){ $('dVeh').focus(); return; }
+  VEH.push({no, ins:$('dIns').value, fit:$('dFit').value, puc:$('dPuc').value, per:$('dPer').value});
+  ['dVeh','dIns','dFit','dPuc','dPer'].forEach(id=>$(id).value='');
+  $('dVeh').focus(); drawDocs();
+};
+
+/* ---------- e-way bills ---------- */
+let EWB=[];
+function hrsTo(s){ if(!s) return null; return (new Date(s) - new Date())/3600000; }
+function fmtLeft(h){
+  if(h===null) return '—';
+  const a=Math.abs(h);
+  const txt = a>=48 ? Math.round(a/24)+' days' : a>=1 ? Math.round(a)+' hr' : Math.round(a*60)+' min';
+  return h<0 ? txt+' ago' : txt;
+}
+function drawEwb(){
+  const t=$('eTable'), box=$('eNext');
+  if(!EWB.length){ t.hidden=true; $('eRows').innerHTML='';
+    box.className='dnext clear'; box.textContent='No live bills. Add one, or photograph the invoice.'; return; }
+  t.hidden=false;
+  const sorted=[...EWB].sort((a,b)=>new Date(a.exp)-new Date(b.exp));
+  $('eRows').innerHTML=sorted.map(e=>{
+    const h=hrsTo(e.exp);
+    const cls = h===null?'' : h<-8?'dgone' : h<=8?'dsoon' : '';
+    const state = h===null?'' : h<-8?'GONE' : h<=8?'EXTEND NOW' : h<=24?'SOON':'';
+    return `<tr class="${cls}">
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${e.no}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-weight:600">${e.veh}</td>
+      <td style="font-family:'Archivo',sans-serif;font-weight:700">${e.to}</td>
+      <td class="dcell">${e.exp?new Date(e.exp).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td>
+      <td class="dcell ${cls==='dgone'?'dgone':cls==='dsoon'?'dsoon':'dok'}"><b>${state}</b>${fmtLeft(h)}</td>
+      <td>${(h!==null&&h<=8&&h>=-8)?`<button type="button" class="extbtn" data-ext="${e.no}">Extend</button>`:''}</td>
+      <td class="del"><button type="button" data-no="${e.no}">×</button></td></tr>`;
+  }).join('');
+  $('eRows').querySelectorAll('.del button').forEach(b=>b.onclick=()=>{
+    EWB=EWB.filter(x=>x.no!==b.dataset.no); drawEwb(); });
+  $('eRows').querySelectorAll('.extbtn').forEach(b=>b.onclick=()=>openExtend(b.dataset.ext));
+
+  const next=sorted.find(e=>hrsTo(e.exp)!==null);
+  if(!next){ box.className='dnext clear'; box.textContent='Add expiry times to see what runs out first.'; return; }
+  const h=hrsTo(next.exp);
+  box.className='dnext';
+  box.textContent = h<-8 ? `${next.veh} — bill for ${next.to} expired ${fmtLeft(h)}. The window has closed.`
+    : h<=8 ? `${next.veh} — bill for ${next.to} ${h<0?'expired '+fmtLeft(h):'expires in '+fmtLeft(h)}. Extend it now, the window shuts in ${Math.round(8+ (h<0?h:0))} hr.`
+    : `${next.veh} — bill for ${next.to} expires in ${fmtLeft(h)}.`;
+}
+function openExtend(no){
+  const e=EWB.find(x=>x.no===no); if(!e) return;
+  const h=hrsTo(e.exp);
+  const box=$('extBox'); box.hidden=false;
+  box.innerHTML=`
+    <h4>Extend ${e.veh} — ${e.to}</h4>
+    <div>Bill number, ready to paste:</div>
+    <div class="big" id="extNo">${e.no}</div>
+    <div style="font-size:13px">Window shuts in about <b>${Math.max(0,Math.round(8+(h<0?h:0)))} hours</b>.</div>
+    <ol>
+      <li>Open the portal and sign in</li>
+      <li>e-Waybill → <b>Extend Validity</b></li>
+      <li>Paste the number above</li>
+      <li>It asks where the vehicle is now — place and PIN code</li>
+      <li>And the distance still to run${e.km?` — roughly <b>${e.km} km</b> was the full lead, so enter what is left`:''}</li>
+      <li>Reason: transhipment, natural calamity, law and order, accident, or other</li>
+    </ol>
+    <div class="row">
+      <button type="button" id="extCopy">Copy the number</button>
+      <a href="https://ewaybillgst.gov.in" target="_blank" rel="noopener">Open the portal</a>
+      <button type="button" id="extHelp">Get someone to do it</button>
+      <button type="button" id="extClose">Close</button>
+    </div>`;
+  $('extCopy').onclick=async()=>{
+    try{ await navigator.clipboard.writeText(e.no); $('extCopy').textContent='Copied'; }
+    catch(err){ $('extCopy').textContent='Select it above and copy'; }
+  };
+  $('extHelp').onclick=()=>{
+    SEG='comp'; SUB.comp='help'; paint();
+    const f=$('hNo'); if(f){ f.value=e.no; f.scrollIntoView({behavior:'smooth',block:'center'}); }
+  };
+  $('extClose').onclick=()=>{ box.hidden=true; };
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('eAdd').onclick=()=>{
+  const no=$('eNo').value.trim();
+  if(!no){ $('eNo').focus(); return; }
+  EWB.push({no, veh:$('eVeh').value.trim().toUpperCase()||'—', to:$('eTo').value.trim()||'—',
+            exp:$('eExp').value, km:+$('eKm').value||0});
+  ['eNo','eVeh','eTo','eExp','eKm'].forEach(id=>$(id).value='');
+  $('eNo').focus(); drawEwb();
+};
+setInterval(()=>{ if(!$('paneEwb').hidden) drawEwb(); }, 60000);
+
+/* ---------- DI / invoice ---------- */
+let DI=null; const LANES={};
+$('diPhoto').onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const box=$('diMsg'); box.hidden=false; box.className='ocr'; box.textContent='Reading the paper…';
+  try{
+    const b64=await new Promise((res,rej)=>{const r=new FileReader();
+      r.onload=()=>res(r.result.split(',')[1]); r.onerror=()=>rej(); r.readAsDataURL(f);});
+    const isPdf = /pdf/i.test(f.type) || /\.pdf$/i.test(f.name);
+    const blk = isPdf
+      ? {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}}
+      : {type:'image',source:{type:'base64',media_type:f.type||'image/jpeg',data:b64}};
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:900,messages:[{role:'user',content:[
+        blk,
+        {type:'text',text:'This is a freight document from an Indian trucking operation — a delivery instruction, tax invoice, lorry receipt or delivery challan. Return ONLY a JSON object, no prose or markdown: {"from":"","to":"","tonnes":0,"vehicle":"","despatch":"","ewb":"","ewbExpiry":"","bagsSent":0,"bagsReceived":0}. tonnes is the quantity in metric tonnes. despatch is the dispatch date. ewbExpiry is the e-way bill expiry if printed. bagsSent and bagsReceived come from the packages count and any handwritten acknowledgement of what was actually received. Use empty string or 0 for anything absent.'}]}]})});
+    const data=await resp.json();
+    const txt=(data.content||[]).map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    DI=JSON.parse(txt);
+    absorbDI();
+    drawDI();
+  }catch(err){ box.className='ocr err';
+    box.textContent='Could not read it here — this needs the server function once deployed.'; }
+};
+$('diDemo').onclick=()=>{
+  const soon=new Date(Date.now()+3*3600000);
+  DI={ from:'Manawar (Dhar Cement Works)', to:'Guna', tonnes:41,
+       vehicle:'MP13H1070', despatch:'03.12.2023',
+       ewb:'651649850079', ewbExpiry:soon.toISOString(),
+       bagsSent:820, bagsReceived:818 };
+  absorbDI(); drawDI();
+  const m=$('diMsg'); m.hidden=false; m.className='ocr';
+  m.innerHTML = `<b>Sample loaded</b> — a real Manawar to Guna DI and invoice.
+    The e-way bill expiry has been set to three hours from now so you can see the extension warning.
+    ${needList().length?'Now just '+needList()[0]+'.':''}`;
+};
+function absorbDI(){
+  if(!DI) return;
+  const done=[];
+  /* tonnage into the truck box */
+  if(DI.tonnes>0){ $('ton').value=DI.tonnes; calc(); done.push(DI.tonnes+' T'); }
+  /* e-way bill onto the clock */
+  if(DI.ewb && !EWB.some(x=>x.no===DI.ewb)){
+    let exp=DI.ewbExpiry||'';
+    const d=new Date(exp);
+    EWB.push({no:DI.ewb, veh:(DI.vehicle||'—').toUpperCase(), to:DI.to||'—',
+              exp: isNaN(d) ? '' : d.toISOString().slice(0,16), km:LANES[(DI.to||'').toLowerCase()]||0});
+    drawEwb(); done.push('e-way bill tracked');
+  }
+  /* vehicle onto the papers list */
+  if(DI.vehicle){
+    const no=DI.vehicle.toUpperCase();
+    if(!VEH.some(v=>v.no===no)){ VEH.push({no, ins:'',fit:'',puc:'',per:''}); drawDocs(); done.push('vehicle added'); }
+  }
+  /* distance remembered from last time on this lane */
+  const key=(DI.to||'').toLowerCase();
+  if(LANES[key]) $('diKm').value=LANES[key];
+  DI._done=done;
+}
+function needList(){
+  const need=[];
+  if(!(+$('diKm').value>0)) need.push('the one-way distance to '+(DI.to||'the destination'));
+  if(!(+$('ton').value>0))  need.push('the tonnes');
+  if(!(+$('diRate').value>0)) need.push('the rate you were offered, if you want the comparison');
+  return need;
+}
+function drawDI(){
+  if(!DI){ $('diCard').hidden=true; return; }
+  $('diCard').hidden=false;
+  $('diRow').innerHTML=`<tr>
+    <td style="font-family:'Archivo',sans-serif;font-weight:700">${DI.from||'—'}</td>
+    <td style="font-family:'Archivo',sans-serif;font-weight:700">${DI.to||'—'}</td>
+    <td>${DI.tonnes||'—'}</td>
+    <td style="font-family:'IBM Plex Mono',monospace;font-weight:600">${DI.vehicle||'—'}</td>
+    <td class="dcell">${DI.despatch||'—'}</td>
+    <td class="dcell">${DI.ewbExpiry||'—'}</td></tr>`;
+  const m=$('diMsg'); m.hidden=false; m.className='ocr';
+  const need=needList();
+  m.innerHTML = `<b>Read it.</b> ${(DI._done&&DI._done.length)?DI._done.join(', ')+'. ':''}`
+    + (need.length ? `Now just ${need[0]}.` : 'Nothing missing — the rate is below.');
+  const s=$('diShort');
+  const sent=+DI.bagsSent||0, got=+DI.bagsReceived||0;
+  if(sent&&got&&got<sent){ s.hidden=false;
+    s.textContent=`${sent-got} bags short — ${got} received against ${sent} sent. That gets debited to you at market price.`; }
+  else s.hidden=true;
+  priceDI();
+}
+function priceDI(){
+  if(!DI){ return; }
+  const km=+$('diKm').value||0, days=+$('diDays').value||2, ton=+$('ton').value||0, offered=+$('diRate').value||0;
+  if(!(km>0&&ton>0)){ $('diPlate').textContent='—'; $('diCmp').innerHTML='Add the one-way distance.'; return; }
+  const t=trip(km,days), a=ask(t.cost);
+  $('diPlate').textContent=money(a)+' / tonne';
+  $('diCmp').innerHTML=`<div class="big">${money(a)} × ${ton} T = <b>${money(a*ton)}</b> for the trip</div>`
+    + (offered>0 ? (offered>=a
+        ? `<div style="color:var(--moss);margin-top:7px">Offered ${money(offered)} — <b>${money(offered*ton-t.cost)} left over</b>.</div>`
+        : `<div style="color:var(--oxide);margin-top:7px">Offered ${money(offered)} — <b>short ${money(t.cost-offered*ton)}</b>.</div>`) : '');
+}
+['diKm','diDays','diRate'].forEach(i=>$(i).addEventListener('input',()=>{
+  if(DI && +$('diKm').value>0){
+    LANES[(DI.to||'').toLowerCase()]=+$('diKm').value;
+    const e=EWB.find(x=>x.no===DI.ewb); if(e) e.km=+$('diKm').value;
+  }
+  const m=$('diMsg');
+  if(DI && !m.hidden && m.className==='ocr'){
+    const need=needList();
+    m.innerHTML = need.length ? `Now just ${need[0]}.` : '<b>Nothing missing</b> — the rate is below.';
+  }
+  priceDI();
+}));
+
+/* ---------- help nearby ---------- */
+const PLACES=[
+  ['RTO office','licence, fitness, permit'],
+  ['insurance office','renewal and claims'],
+  ['pollution testing PUC centre','PUC certificate'],
+  ['truck mechanic','breakdown'],
+  ['tyre shop','puncture, retread'],
+  ['petrol pump diesel','fuel'],
+  ['weighbridge','tonnage check'],
+  ['truck parking dhaba','rest'],
+  ['hospital','emergency'],
+  ['police station','incident, seizure'],
+];
+function drawHelp(lat,lng){
+  $('helpGrid').innerHTML=PLACES.map(([q,sub])=>{
+    const url = (lat!=null)
+      ? `https://www.google.com/maps/search/${encodeURIComponent(q)}/@${lat},${lng},13z`
+      : `https://www.google.com/maps/search/${encodeURIComponent(q+' near me')}`;
+    const label=q.replace(' office','').replace(' PUC centre',' / PUC').replace('pollution testing','PUC')
+                 .replace(' diesel','').replace(' dhaba','');
+    return `<a href="${url}" target="_blank" rel="noopener">${label.charAt(0).toUpperCase()+label.slice(1)}<span>${sub}</span></a>`;
+  }).join('');
+}
+$('locBtn').onclick=()=>{
+  const m=$('locMsg'); m.hidden=false; m.className='ocr'; m.textContent='Finding the truck…';
+  if(!navigator.geolocation){ m.className='ocr err'; m.textContent='This phone will not share location. The buttons still work using "near me".'; return; }
+  navigator.geolocation.getCurrentPosition(
+    p=>{ m.textContent='Using your position. Everything below is sorted around the truck.';
+         drawHelp(p.coords.latitude.toFixed(5), p.coords.longitude.toFixed(5)); },
+    ()=>{ m.className='ocr err'; m.textContent='Location was refused. The buttons still work using "near me".'; }
+  );
+};
+$('hSend').onclick=()=>{
+  const m=$('hMsg'); m.hidden=false;
+  if(!$('hNo').value.trim()||!$('hPh').value.trim()){
+    m.className='ocr err'; m.textContent='Bill number and your phone number, both.'; return; }
+  m.className='ocr';
+  m.textContent='Nothing was sent — there is no server yet. Once there is, this reaches whoever is on duty and they call you back.';
+};
+drawHelp(null,null);
+
+/* ---------- help nearby ---------- */
+function findHelp(q){
+  const msg=$('helpMsg');
+  const open=(url)=>window.open(url,'_blank','noopener');
+  if(!navigator.geolocation){
+    msg.textContent='This phone will not share location — opening a plain search.';
+    return open('https://www.google.com/maps/search/'+encodeURIComponent(q));
+  }
+  msg.textContent='Finding you…';
+  navigator.geolocation.getCurrentPosition(
+    p=>{ msg.textContent='';
+      open(`https://www.google.com/maps/search/${encodeURIComponent(q)}/@${p.coords.latitude},${p.coords.longitude},13z`); },
+    ()=>{ msg.textContent='Location refused — opening a plain search instead.';
+      open('https://www.google.com/maps/search/'+encodeURIComponent(q)); },
+    {timeout:8000}
+  );
+}
+document.querySelectorAll('.hrow button').forEach(b=>b.onclick=()=>findHelp(b.dataset.q));
+
+/* tabs */
+let SEG='rate', SUB={rate:'one', comp:'di'}, TRUCKOPEN=false;
+function truckSummary(){ /* the bar stays a plain prompt */ }
+function paint(){
+  $('segRate').hidden = SEG!=='rate';
+  $('segComp').hidden = SEG!=='comp';
+  $('sRate').setAttribute('aria-pressed',SEG==='rate');
+  $('sComp').setAttribute('aria-pressed',SEG==='comp');
+  $('truckPanel').hidden = !(SEG==='rate' && TRUCKOPEN);
+
+  const R = SEG==='rate' && !TRUCKOPEN;
+  $('paneOne').hidden  = !(R && SUB.rate==='one');
+  $('paneMany').hidden = !(R && SUB.rate==='many');
+  const C = SEG==='comp';
+  $('paneDI').hidden   = !(C && SUB.comp==='di');
+  $('paneEwb').hidden  = !(C && SUB.comp==='ewb');
+  $('paneDoc').hidden  = !(C && SUB.comp==='doc');
+  $('paneHelp').hidden = !(C && SUB.comp==='help');
+  $('crossBar').hidden = !C;
+
+  $('tOne').setAttribute('aria-pressed',SUB.rate==='one');
+  $('tMany').setAttribute('aria-pressed',SUB.rate==='many');
+  [['tDoc2','di'],['tEwb','ewb'],['tDoc','doc'],['tHelp','help']]
+    .forEach(([b,k])=>$(b).setAttribute('aria-pressed',SUB.comp===k));
+
+  truckSummary();
+  if(C && SUB.comp==='ewb') drawEwb();
+}
+const goTop=()=>window.scrollTo({top:0,behavior:'smooth'});
+$('sRate').onclick=()=>{SEG='rate';paint();};
+$('sComp').onclick=()=>{SEG='comp';TRUCKOPEN=false;paint();};
+$('tOne').onclick=()=>{SUB.rate='one';TRUCKOPEN=false;paint();};
+$('tMany').onclick=()=>{SUB.rate='many';TRUCKOPEN=false;paint();};
+$('tDoc2').onclick=()=>{SUB.comp='di';paint();};
+$('tEwb').onclick=()=>{SUB.comp='ewb';paint();};
+$('tDoc').onclick=()=>{SUB.comp='doc';paint();};
+$('tHelp').onclick=()=>{SUB.comp='help';paint();};
+$('tEdit').onclick=()=>{TRUCKOPEN=true;paint();goTop();};
+$('tDone').onclick=()=>{TRUCKOPEN=false;paint();};
+$('goRate').onclick=()=>{SEG='rate';paint();goTop();};
+
+sel.onchange=seed;
+['ton','mil','lead','days','rate','fuel','defpc','tyC','tyN','tyL','svcC','svcK','rep',
+ 'drv','toll','tollback','emi','ins','per','oth','run','spd']
+  .forEach(i=>$(i).addEventListener('input',calc));
+seed(); render(); drawDocs(); drawEwb(); paint();
+</script>
+</body></html>
