@@ -9,7 +9,7 @@
  */
 
 (function () {
-  var ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbzm6v62j6UzG8M9b8Ub_RmBTxm7EE4IMaTz6FwkUKt5S-159hJVIXma3gNom-IA5B8/exec';
 
   // Stable anonymous id so repeat users are visible, not just repeat visits.
   function visitorId() {
