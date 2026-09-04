@@ -159,6 +159,14 @@ details input{font-size:16px}
   margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--rule)}
 .derived{margin-top:14px;padding:10px 12px;background:var(--slip);border-left:3px solid var(--ink);font-size:12.5px}
 .derived b{font-weight:700}
+.truckrow{display:flex;gap:8px;align-items:flex-end}
+.truckrow>div{flex:1;min-width:0}
+.truckrow select,.truckrow input{padding:9px 7px;font-size:16px}
+.costcall{display:block;width:100%;text-align:left;font-family:inherit;cursor:pointer;
+  border:2px solid var(--oxide);background:#fff;color:var(--ink);padding:13px 15px;margin-top:14px}
+.costcall b{display:block;font-size:14.5px;font-weight:900;color:var(--oxide)}
+.costcall span{display:block;font-size:12.5px;color:var(--mute);margin-top:4px;line-height:1.45}
+.costcall:active{background:var(--paper)}
 .hints{font-size:12px;color:var(--mute);margin-top:11px;max-width:76ch;line-height:1.5}
 footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding-top:12px;max-width:64ch}
 </style>
@@ -176,15 +184,10 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 </header>
 
 <div class="panel" id="truckPanel" hidden>
-  <h2>Set your truck once</h2>
-  <p class="sub">These stay put. Average matters most — every vehicle runs differently.</p>
-  <div class="grid g3">
-    <div><label for="cfg">Truck</label><select id="cfg"></select></div>
-    <div><label for="ton">Tonnes</label><input class="num" id="ton" type="number" step="0.5"></div>
-    <div><label for="mil">Average <i>km/L</i></label><input class="num" id="mil" type="number" step="0.05"></div>
-  </div>
-  <details>
-    <summary>Your costs — asked the way you actually pay them</summary>
+  <h2>Your costs</h2>
+  <p class="sub">Asked the way you actually pay them — the bill, and how long it lasts.</p>
+  <details open>
+    <summary>Every number behind the rate</summary>
     <p class="hints" style="margin:11px 0 0">Nobody knows their servicing in rupees per kilometre. Put in the bill and how long it lasts; the per-km figure works itself out.</p>
 
     <div class="ctitle">Fuel</div>
@@ -223,18 +226,27 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
       <div><label for="run">Days you run in a month</label><input class="num" id="run" type="number" step="1" value="26"></div>
       <div><label for="spd">Km you cover in a day</label><input class="num" id="spd" type="number" step="10" value="250"></div>
     </div>
-    <div class="derived num" id="derived"></div>
   </details>
   <div class="btnrow" style="margin:15px 0 0"><button type="button" id="tDone">Done</button></div>
 </div>
 
 <div class="seg">
-  <button id="sRate" aria-pressed="true"><b>What should this pay?</b><span>Work out a rate</span></button>
+  <button id="sRate" aria-pressed="true"><b>Is your freight making you money?</b><span>Your cost against their rate</span></button>
   <button id="sComp" aria-pressed="false"><b>Papers and deadlines</b><span>Nothing expires on you</span></button>
 </div>
 
 <div id="segRate">
-  <div class="truckbar"><div class="tsum" id="tSum">Insert your truck details</div><button type="button" id="tEdit">Enter</button></div>
+  <div class="panel" style="margin-bottom:12px">
+  <h2>Your truck</h2>
+  <p class="sub">Average matters most — every vehicle runs differently.</p>
+  <div class="truckrow">
+    <div><label for="cfg">Truck</label><select id="cfg"></select></div>
+    <div><label for="ton">Tonnes</label><input class="num" id="ton" type="number" step="0.5"></div>
+    <div><label for="mil">Average <i>km/L</i></label><input class="num" id="mil" type="number" step="0.05"></div>
+  </div>
+  <button type="button" class="costcall" id="tEdit"><b>These three are not the whole cost.</b><span>Fourteen more numbers sit behind the rate below &mdash; tyres, service, driver, toll, EMI, insurance, permits. Right now it is running on a typical truck, not yours. <b style="display:inline;font-size:12.5px">Put your own in &rarr;</b></span></button>
+  <div class="derived num" id="derived"></div>
+</div>
   <div class="tabs sub">
     <button id="tOne" aria-pressed="true">One trip</button>
     <button id="tMany" aria-pressed="false">Whole contract</button>
@@ -254,11 +266,12 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 <div class="panel" id="paneOne">
   <h2>One trip</h2>
   <p class="sub">Lead is one way — the empty return is added. Days is door to door, including time standing at the gate.</p>
-  <div class="grid g3">
+  <div class="truckrow">
     <div><label for="lead">Lead km <i>one way</i></label><input class="num" id="lead" type="number" step="10" value="201"></div>
-    <div><label for="days">Days to complete the trip</label><input class="num" id="days" type="number" step="0.5" min="0.5" value="2.5"></div>
+    <div><label for="days">Turnaround <i>door to door</i></label><input class="num" id="days" type="number" step="0.5" min="0.5" value="2.5"></div>
     <div><label for="rate">Rate offered <i>blank if none</i></label><div class="rs"><input class="num" id="rate" type="number" step="10" placeholder="—"></div></div>
   </div>
+  <div class="btnrow" style="margin:15px 0 0"><button type="button" id="goCalc">Let&rsquo;s calculate</button></div>
   <div class="answer">
     <div class="tag">BREAKEVEN RATE</div>
     <div class="plate" id="plate">—</div>
@@ -465,12 +478,17 @@ const v=id=>+$(id).value||0;
 const sel=$('cfg');
 CFG.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.n;sel.appendChild(o);});
 sel.value=7;
+const TOUCHED=new Set();
+function setIf(id,val){ if(!TOUCHED.has(id)) $(id).value=val; }
 function seed(){
   const c=CFG[+sel.value];
-  $('ton').value=c.ton; $('mil').value=c.mil; $('drv').value=c.drv; $('toll').value=c.toll;
-  $('tyN').value=c.tyN; $('tyC').value=c.tyC; $('tyL').value=90000;
-  $('svcC').value=c.svcC; $('svcK').value=15000; $('rep').value=c.rep;
-  $('emi').value=c.emi; $('ins').value=c.ins; $('per').value=c.per; $('oth').value=c.oth;
+  /* tonnes and average are definitional to the vehicle, so they always follow the truck */
+  $('ton').value=c.ton; $('mil').value=c.mil;
+  /* costs are the operator's own — only fill the ones he has not edited himself */
+  setIf('drv',c.drv); setIf('toll',c.toll);
+  setIf('tyN',c.tyN); setIf('tyC',c.tyC); setIf('tyL',90000);
+  setIf('svcC',c.svcC); setIf('svcK',15000); setIf('rep',c.rep);
+  setIf('emi',c.emi); setIf('ins',c.ins); setIf('per',c.per); setIf('oth',c.oth);
   calc();
 }
 function estDays(lead){ const s=v('spd')||250; return Math.max(0.5, Math.round((lead*2/s+1)*2)/2); }
@@ -493,9 +511,16 @@ function trip(lead,daysIn){
   const cost=fuel+perKm+v('drv')+days*R.fixDay;
   return {km,days,fuel,perKm,cost,R};
 }
+const COSTKEYS=['fuel','tyC','tyN','tyL','svcC','svcK','rep','drv','toll','emi','ins','per','run','spd'];
 function showDerived(){
+  const left = COSTKEYS.filter(k=>!TOUCHED.has(k)).length;
+  if(left>0){
+    $('derived').innerHTML=`<b>Want to know your cost per kilometre?</b>
+      Click on <b>Put your own in</b> above.`;
+    return;
+  }
   const R=rates();
-  $('derived').innerHTML=`Works out at <b>${money(R.runKm)} a km</b> on the road
+  $('derived').innerHTML=`Your cost is <b>${money(R.runKm)} a km</b> on the road
     — fuel ${money(R.fuelKm)}, tyres ${money(R.tyreKm)}, service and repairs ${money(R.svcKm+R.repKm)},
     DEF ${money(R.defKm)}${R.tollKm?`, toll ${money(R.tollKm)}`:''} — and
     <b>${money(R.fixDay)} a day</b> standing still.`;
@@ -1008,12 +1033,13 @@ $('tDoc').onclick=()=>{SUB.comp='doc';paint();};
 $('tHelp').onclick=()=>{SUB.comp='help';paint();};
 $('tEdit').onclick=()=>{TRUCKOPEN=true;paint();goTop();};
 $('tDone').onclick=()=>{TRUCKOPEN=false;paint();};
+$('goCalc').onclick=()=>{calc();$('plate').scrollIntoView({behavior:'smooth',block:'center'});};
 $('goRate').onclick=()=>{SEG='rate';paint();goTop();};
 
 sel.onchange=seed;
 ['ton','mil','lead','days','rate','fuel','defpc','tyC','tyN','tyL','svcC','svcK','rep',
  'drv','toll','tollback','emi','ins','per','oth','run','spd']
-  .forEach(i=>$(i).addEventListener('input',calc));
+  .forEach(i=>$(i).addEventListener('input',()=>{TOUCHED.add(i);calc();}));
 seed(); render(); drawDocs(); drawEwb(); paint();
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
