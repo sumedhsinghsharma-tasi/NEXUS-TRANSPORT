@@ -87,6 +87,11 @@ td .rs::before{left:6px;font-size:13px} td .rs input{padding-left:18px}
 .btnrow button{font-family:'Archivo',sans-serif;font-size:12.5px;font-weight:700;background:var(--ink);
   color:var(--slip);border:0;padding:10px 13px;cursor:pointer}
 .btnrow button:active{background:var(--oxide)}
+.btnrow button.ghost{background:transparent;color:var(--mute);border:1px solid var(--line)}
+.btnrow button.ghost:active{background:var(--paper);color:var(--ink)}
+.optline{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12.5px;
+  color:var(--mute);cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400}
+.optline input{width:auto;margin:0;flex:none}
 .tally{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
 .chip{border:2px solid var(--ink);padding:7px 12px;font-weight:900;font-size:13px}
 .chip.g{background:var(--moss);color:#F0F2E6;border-color:var(--moss)}
@@ -225,9 +230,8 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
       <div><label for="emi">EMI in a month</label><div class="rs"><input class="num" id="emi" type="number" step="1000"></div></div>
       <div><label for="ins">Insurance in a year</label><div class="rs"><input class="num" id="ins" type="number" step="1000"></div></div>
       <div><label for="per">Permit, tax, fitness a year</label><div class="rs"><input class="num" id="per" type="number" step="1000"></div></div>
-      <div><label for="oth">Office and administrative a month <i>zero if you do it yourself</i></label><div class="rs"><input class="num" id="oth" type="number" step="500"></div></div>
+      <div><label for="oth">Office and administrative a trip <i>zero if you do it yourself</i></label><div class="rs"><input class="num" id="oth" type="number" step="500"></div></div>
       <div><label for="run">Days you run in a month</label><input class="num" id="run" type="number" step="1"></div>
-      <div><label for="spd">Km you cover in a day</label><input class="num" id="spd" type="number" step="10"></div>
     </div>
   </details>
   <div class="btnrow" style="margin:15px 0 0"><button type="button" id="tDone">Done</button></div>
@@ -268,13 +272,14 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 <!-- ONE TRIP -->
 <div class="panel" id="paneOne">
   <h2>One trip</h2>
-  <p class="sub">Lead is one way — the empty return is added. Days is door to door, including time standing at the gate.</p>
+  <p class="sub">Distance is the run you are quoting for, A to B.</p>
   <div class="truckrow">
-    <div><label for="lead">Lead km <i>one way</i></label><input class="num" id="lead" type="number" step="10"></div>
-    <div><label for="days">Turnaround <i>door to door</i></label><input class="num" id="days" type="number" step="0.5" min="0.5"></div>
+    <div><label for="lead">Distance <i>A to B</i></label><input class="num" id="lead" type="number" step="10"></div>
+    <div><label for="days">Trip time</label><input class="num" id="days" type="number" step="0.5" min="0.5"></div>
     <div><label for="rate">Rate offered <i>blank if none</i></label><div class="rs"><input class="num" id="rate" type="number" step="10" placeholder="—"></div></div>
   </div>
-  <div class="btnrow" style="margin:15px 0 0"><button type="button" id="goCalc">Let&rsquo;s calculate</button></div>
+  <label class="optline"><input type="checkbox" id="rtn"> Truck comes back empty — charge the return leg too</label>
+  <div class="btnrow" style="margin:15px 0 0"><button type="button" id="goCalc">Let&rsquo;s calculate</button><button type="button" class="ghost" id="resetAll">Start again</button></div>
   <div class="answer">
     <div class="tag">BREAKEVEN RATE</div>
     <div class="plate" id="plate">—</div>
@@ -458,7 +463,7 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 <footer>
   Cost is fuel at your average, tyres, toll, DEF and parts per kilometre, driver and advance per trip,
   and your fixed cost for every day the vehicle is held. The rate shown is the point at which the trip stops losing money —
-  anything above it is yours. Leave the days column blank and it estimates from your km per day.
+  anything above it is yours. Leave the days column blank and it estimates the trip time for you.
 </footer>
 
 </div>
@@ -492,42 +497,48 @@ function seed(){
   setIf('tyN',c.tyN);
   calc();
 }
-function estDays(lead){ const s=v('spd')||250; return Math.max(0.5, Math.round((lead*2/s+1)*2)/2); }
+function estDays(lead){ const s=250; /* only a placeholder when turnaround is left blank */
+  const d=($('rtn')&&$('rtn').checked)?lead*2:lead;
+  return Math.max(0.5, Math.round((d/s+1)*2)/2); }
 function rates(){
   const fuelKm = v('mil')>0 ? v('fuel')/v('mil') : 0;
   const defKm  = fuelKm*v('defpc')/100;
   const tyreKm = v('tyL')>0 ? v('tyN')*v('tyC')/v('tyL') : 0;
   const svcKm  = v('svcK')>0 ? v('svcC')/v('svcK') : 0;
-  const kmMonth= (v('run')||26)*(v('spd')||250);
-  const repKm  = kmMonth>0 ? v('rep')/kmMonth : 0;
   const tollKm = v('tollback')?0:v('toll');
-  const fixDay = (v('emi')+v('ins')/12+v('per')/12+v('oth'))/(v('run')||26);
-  return {fuelKm,defKm,tyreKm,svcKm,repKm,tollKm,fixDay,
-          runKm: fuelKm+defKm+tyreKm+svcKm+repKm+tollKm};
+  /* repairs are a monthly bill and there is no km-per-day to spread them over,
+     so they sit on the day rate with EMI, insurance and permits */
+  const fixDay = (v('emi')+v('ins')/12+v('per')/12+v('rep'))/(v('run')||26);
+  return {fuelKm,defKm,tyreKm,svcKm,tollKm,fixDay,
+          runKm: fuelKm+defKm+tyreKm+svcKm+tollKm};
 }
 function trip(lead,daysIn){
-  const km=lead*2, R=rates();
+  const km=($('rtn')&&$('rtn').checked)?lead*2:lead, R=rates();
   const days=Math.max(0.5, daysIn||estDays(lead));
   const fuel=R.fuelKm*km, perKm=(R.runKm-R.fuelKm)*km;
-  const cost=fuel+perKm+v('drv')+days*R.fixDay;
+  const cost=fuel+perKm+v('drv')+v('oth')+days*R.fixDay;
   return {km,days,fuel,perKm,cost,R};
 }
 let COSTSDONE=false;
 const ASKCOST=`<b>These three are not the whole cost.</b><span>Fourteen more numbers sit behind the rate &mdash; tyres, service, driver, toll, EMI, insurance, permits. Nothing here is guessed for you. <b style="display:inline;font-size:12.5px">Put your own in &rarr;</b></span>`;
 const OWNCOST=`<b>Running on your own numbers.</b><span>Anything changed &mdash; a diesel move, a new tyre price, an EMI that shifts? <b style="display:inline;font-size:12.5px">Change them &rarr;</b></span>`;
+let LASTSTATE=null;
 function showDerived(){
   const cc=$('tEdit');
+  if(cc && LASTSTATE!==COSTSDONE){
+    cc.classList.toggle('ok',COSTSDONE);
+    cc.innerHTML = COSTSDONE?OWNCOST:ASKCOST;
+    LASTSTATE=COSTSDONE;
+  }
   if(!COSTSDONE){
-    if(cc){ cc.classList.remove('ok'); cc.innerHTML=ASKCOST; }
     $('derived').innerHTML=`<b>Want to know your cost per kilometre?</b> Click on <b>Put your own in</b> above.`;
     return;
   }
-  if(cc){ cc.classList.add('ok'); cc.innerHTML=OWNCOST; }
   const R=rates();
   $('derived').innerHTML=`Your cost is <b>${money(R.runKm)} a km</b> on the road
-    — fuel ${money(R.fuelKm)}, tyres ${money(R.tyreKm)}, service and repairs ${money(R.svcKm+R.repKm)},
+    — fuel ${money(R.fuelKm)}, tyres ${money(R.tyreKm)}, service ${money(R.svcKm)},
     DEF ${money(R.defKm)}${R.tollKm?`, toll ${money(R.tollKm)}`:''} — and
-    <b>${money(R.fixDay)} a day</b> standing still.`;
+    <b>${money(R.fixDay)} a day</b> the vehicle is held, which carries EMI, insurance, permits and repairs.`;
 }
 const ask=cost=>{const t=v('ton');return t>0?Math.ceil(cost/t):0;};
 
@@ -546,7 +557,8 @@ function calcOne(){
     <div><span>Fuel — ${t.km} km</span><span>${money(t.fuel)}</span></div>
     <div><span>Tyres, service, DEF${t.R.tollKm?', toll':''}</span><span>${money(t.perKm)}</span></div>
     <div><span>Driver and advance</span><span>${money(v('drv'))}</span></div>
-    <div><span>Fixed — ${t.days} days</span><span>${money(t.days*t.R.fixDay)}</span></div>
+    ${v('oth')>0?`<div><span>Office and administrative</span><span>${money(v('oth'))}</span></div>`:''}
+    <div><span>EMI, insurance, permits, repairs — ${t.days} days</span><span>${money(t.days*t.R.fixDay)}</span></div>
     <div class="rule"><span>Cost of the trip</span><span>${money(t.cost)}</span></div>` : '';
   showDerived();
 }
@@ -1037,12 +1049,21 @@ $('tDoc').onclick=()=>{SUB.comp='doc';paint();};
 $('tHelp').onclick=()=>{SUB.comp='help';paint();};
 $('tEdit').onclick=()=>{TRUCKOPEN=true;paint();goTop();};
 $('tDone').onclick=()=>{COSTSDONE=true;TRUCKOPEN=false;paint();calc();};
+if($('rtn')) $('rtn').addEventListener('change',calc);
 $('goCalc').onclick=()=>{calc();$('plate').scrollIntoView({behavior:'smooth',block:'center'});};
+$('resetAll').onclick=()=>{
+  ['ton','mil','lead','days','rate','fuel','defpc','tyC','tyN','tyL','svcC','svcK','rep',
+   'drv','toll','tollback','emi','ins','per','oth','run'].forEach(i=>{ if($(i)) $(i).value=''; });
+  if($('rtn')) $('rtn').checked=false;
+  sel.value=''; TOUCHED.clear(); COSTSDONE=false; TRUCKOPEN=false;
+  paint(); calc();
+  window.scrollTo({top:0,behavior:'smooth'});
+};
 $('goRate').onclick=()=>{SEG='rate';paint();goTop();};
 
 sel.onchange=seed;
 ['ton','mil','lead','days','rate','fuel','defpc','tyC','tyN','tyL','svcC','svcK','rep',
- 'drv','toll','tollback','emi','ins','per','oth','run','spd']
+ 'drv','toll','tollback','emi','ins','per','oth','run']
   .forEach(i=>$(i).addEventListener('input',()=>{TOUCHED.add(i);calc();}));
 seed(); render(); drawDocs(); drawEwb(); paint();
 </script>
