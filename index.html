@@ -168,6 +168,8 @@ details input{font-size:16px}
 .costcall b{display:block;font-size:14.5px;font-weight:900;color:var(--oxide)}
 .costcall span{display:block;font-size:12.5px;color:var(--mute);margin-top:4px;line-height:1.45}
 .costcall:active{background:var(--paper)}
+.costcall.ok{border-color:var(--moss)}
+.costcall.ok b{color:var(--moss)}
 .hints{font-size:12px;color:var(--mute);margin-top:11px;max-width:76ch;line-height:1.5}
 footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding-top:12px;max-width:64ch}
 </style>
@@ -193,21 +195,21 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 
     <div class="ctitle">Fuel</div>
     <div class="grid">
-      <div><label for="fuel">Diesel per litre</label><div class="rs"><input class="num" id="fuel" type="number" step="1" value="99"></div></div>
-      <div><label for="defpc">DEF as % of diesel <i>0 for BS4</i></label><input class="num" id="defpc" type="number" step="0.5" value="4"></div>
+      <div><label for="fuel">Diesel per litre</label><div class="rs"><input class="num" id="fuel" type="number" step="1"></div></div>
+      <div><label for="defpc">DEF as % of diesel <i>0 for BS4</i></label><input class="num" id="defpc" type="number" step="0.5"></div>
     </div>
 
     <div class="ctitle">Tyres</div>
     <div class="grid">
       <div><label for="tyC">One tyre costs</label><div class="rs"><input class="num" id="tyC" type="number" step="500"></div></div>
       <div><label for="tyN">How many tyres</label><input class="num" id="tyN" type="number" step="1"></div>
-      <div><label for="tyL">A tyre lasts <i>km</i></label><input class="num" id="tyL" type="number" step="5000" value="90000"></div>
+      <div><label for="tyL">A tyre lasts <i>km</i></label><input class="num" id="tyL" type="number" step="5000"></div>
     </div>
 
     <div class="ctitle">Service and repairs</div>
     <div class="grid">
       <div><label for="svcC">One service costs</label><div class="rs"><input class="num" id="svcC" type="number" step="500"></div></div>
-      <div><label for="svcK">Service every <i>km</i></label><input class="num" id="svcK" type="number" step="1000" value="15000"></div>
+      <div><label for="svcK">Service every <i>km</i></label><input class="num" id="svcK" type="number" step="1000"></div>
       <div><label for="rep">Repairs in a month</label><div class="rs"><input class="num" id="rep" type="number" step="500"></div></div>
     </div>
 
@@ -215,7 +217,7 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
     <div class="grid">
       <div><label for="drv">Driver and advance</label><div class="rs"><input class="num" id="drv" type="number" step="100"></div></div>
       <div><label for="toll">Toll per km</label><div class="rs"><input class="num" id="toll" type="number" step="0.5"></div></div>
-      <div><label for="tollback">Toll reimbursed <i>1 yes, 0 no</i></label><input class="num" id="tollback" type="number" step="1" min="0" max="1" value="0"></div>
+      <div><label for="tollback">Toll reimbursed <i>1 yes, 0 no</i></label><input class="num" id="tollback" type="number" step="1" min="0" max="1"></div>
     </div>
 
     <div class="ctitle">Paid whether the truck moves or not</div>
@@ -223,9 +225,9 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
       <div><label for="emi">EMI in a month</label><div class="rs"><input class="num" id="emi" type="number" step="1000"></div></div>
       <div><label for="ins">Insurance in a year</label><div class="rs"><input class="num" id="ins" type="number" step="1000"></div></div>
       <div><label for="per">Permit, tax, fitness a year</label><div class="rs"><input class="num" id="per" type="number" step="1000"></div></div>
-      <div><label for="oth">Office and administrative a month <i>zero if you do it yourself</i></label><div class="rs"><input class="num" id="oth" type="number" step="500" value="0"></div></div>
-      <div><label for="run">Days you run in a month</label><input class="num" id="run" type="number" step="1" value="26"></div>
-      <div><label for="spd">Km you cover in a day</label><input class="num" id="spd" type="number" step="10" value="250"></div>
+      <div><label for="oth">Office and administrative a month <i>zero if you do it yourself</i></label><div class="rs"><input class="num" id="oth" type="number" step="500"></div></div>
+      <div><label for="run">Days you run in a month</label><input class="num" id="run" type="number" step="1"></div>
+      <div><label for="spd">Km you cover in a day</label><input class="num" id="spd" type="number" step="10"></div>
     </div>
   </details>
   <div class="btnrow" style="margin:15px 0 0"><button type="button" id="tDone">Done</button></div>
@@ -245,7 +247,7 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
     <div><label for="ton">Tonnes</label><input class="num" id="ton" type="number" step="0.5"></div>
     <div><label for="mil">Average <i>km/L</i></label><input class="num" id="mil" type="number" step="0.05"></div>
   </div>
-  <button type="button" class="costcall" id="tEdit"><b>These three are not the whole cost.</b><span>Fourteen more numbers sit behind the rate below &mdash; tyres, service, driver, toll, EMI, insurance, permits. Right now it is running on a typical truck, not yours. <b style="display:inline;font-size:12.5px">Put your own in &rarr;</b></span></button>
+  <button type="button" class="costcall" id="tEdit"></button>
   <div class="derived num" id="derived"></div>
 </div>
   <div class="tabs sub">
@@ -268,8 +270,8 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
   <h2>One trip</h2>
   <p class="sub">Lead is one way — the empty return is added. Days is door to door, including time standing at the gate.</p>
   <div class="truckrow">
-    <div><label for="lead">Lead km <i>one way</i></label><input class="num" id="lead" type="number" step="10" value="201"></div>
-    <div><label for="days">Turnaround <i>door to door</i></label><input class="num" id="days" type="number" step="0.5" min="0.5" value="2.5"></div>
+    <div><label for="lead">Lead km <i>one way</i></label><input class="num" id="lead" type="number" step="10"></div>
+    <div><label for="days">Turnaround <i>door to door</i></label><input class="num" id="days" type="number" step="0.5" min="0.5"></div>
     <div><label for="rate">Rate offered <i>blank if none</i></label><div class="rs"><input class="num" id="rate" type="number" step="10" placeholder="—"></div></div>
   </div>
   <div class="btnrow" style="margin:15px 0 0"><button type="button" id="goCalc">Let&rsquo;s calculate</button></div>
@@ -477,19 +479,17 @@ const money=n=>'₹'+Math.round(n).toLocaleString('en-IN');
 const v=id=>+$(id).value||0;
 
 const sel=$('cfg');
+{const p=document.createElement('option');p.value='';p.textContent='Choose truck';sel.appendChild(p);}
 CFG.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.n;sel.appendChild(o);});
-sel.value=7;
+sel.value='';
 const TOUCHED=new Set();
 function setIf(id,val){ if(!TOUCHED.has(id)) $(id).value=val; }
 function seed(){
+  if(sel.value===''){ calc(); return; }
+  /* the only thing a truck type actually tells us is how many tyres it has.
+     Every cost stays blank — nothing on this page is guessed for the operator. */
   const c=CFG[+sel.value];
-  /* tonnes and average are definitional to the vehicle, so they always follow the truck */
-  $('ton').value=c.ton; $('mil').value=c.mil;
-  /* costs are the operator's own — only fill the ones he has not edited himself */
-  setIf('drv',c.drv); setIf('toll',c.toll);
-  setIf('tyN',c.tyN); setIf('tyC',c.tyC); setIf('tyL',90000);
-  setIf('svcC',c.svcC); setIf('svcK',15000); setIf('rep',c.rep);
-  setIf('emi',c.emi); setIf('ins',c.ins); setIf('per',c.per); setIf('oth',c.oth);
+  setIf('tyN',c.tyN);
   calc();
 }
 function estDays(lead){ const s=v('spd')||250; return Math.max(0.5, Math.round((lead*2/s+1)*2)/2); }
@@ -512,14 +512,17 @@ function trip(lead,daysIn){
   const cost=fuel+perKm+v('drv')+days*R.fixDay;
   return {km,days,fuel,perKm,cost,R};
 }
-const COSTKEYS=['fuel','tyC','tyN','tyL','svcC','svcK','rep','drv','toll','emi','ins','per','run','spd'];
+let COSTSDONE=false;
+const ASKCOST=`<b>These three are not the whole cost.</b><span>Fourteen more numbers sit behind the rate &mdash; tyres, service, driver, toll, EMI, insurance, permits. Nothing here is guessed for you. <b style="display:inline;font-size:12.5px">Put your own in &rarr;</b></span>`;
+const OWNCOST=`<b>Running on your own numbers.</b><span>Anything changed &mdash; a diesel move, a new tyre price, an EMI that shifts? <b style="display:inline;font-size:12.5px">Change them &rarr;</b></span>`;
 function showDerived(){
-  const left = COSTKEYS.filter(k=>!TOUCHED.has(k)).length;
-  if(left>0){
-    $('derived').innerHTML=`<b>Want to know your cost per kilometre?</b>
-      Click on <b>Put your own in</b> above.`;
+  const cc=$('tEdit');
+  if(!COSTSDONE){
+    if(cc){ cc.classList.remove('ok'); cc.innerHTML=ASKCOST; }
+    $('derived').innerHTML=`<b>Want to know your cost per kilometre?</b> Click on <b>Put your own in</b> above.`;
     return;
   }
+  if(cc){ cc.classList.add('ok'); cc.innerHTML=OWNCOST; }
   const R=rates();
   $('derived').innerHTML=`Your cost is <b>${money(R.runKm)} a km</b> on the road
     — fuel ${money(R.fuelKm)}, tyres ${money(R.tyreKm)}, service and repairs ${money(R.svcKm+R.repKm)},
@@ -1033,7 +1036,7 @@ $('tEwb').onclick=()=>{SUB.comp='ewb';paint();};
 $('tDoc').onclick=()=>{SUB.comp='doc';paint();};
 $('tHelp').onclick=()=>{SUB.comp='help';paint();};
 $('tEdit').onclick=()=>{TRUCKOPEN=true;paint();goTop();};
-$('tDone').onclick=()=>{TRUCKOPEN=false;paint();};
+$('tDone').onclick=()=>{COSTSDONE=true;TRUCKOPEN=false;paint();calc();};
 $('goCalc').onclick=()=>{calc();$('plate').scrollIntoView({behavior:'smooth',block:'center'});};
 $('goRate').onclick=()=>{SEG='rate';paint();goTop();};
 
