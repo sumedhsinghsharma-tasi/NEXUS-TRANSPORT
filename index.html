@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--ink:#16150F;--slip:#DDE0D4;--paper:#EFF0E9;--plate:#F5C518;
       --oxide:#9E3B1E;--moss:#3F5D2E;--amber:#B87A16;--mute:#6C6F62;--rule:#B9BDAE}
@@ -19,7 +18,7 @@ header{border-bottom:2px solid var(--ink);padding:24px 0 15px;margin-bottom:20px
 .eyebrow{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:700}
 h1{font-size:clamp(27px,6.6vw,44px);font-weight:900;line-height:.97;letter-spacing:-.02em;margin:8px 0 10px}
 .thesis{font-size:14.5px;max-width:54ch;color:#2C2B22}
-h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:900;
+h2{font-size:15px;color:var(--ink);letter-spacing:.16em;text-transform:uppercase;font-weight:900;
    padding-bottom:6px;border-bottom:1px solid var(--ink);margin:0 0 4px}
 .sub{font-size:12.5px;color:var(--mute);margin-bottom:13px}
 .panel{background:var(--paper);border:2px solid var(--ink);padding:17px;margin-bottom:18px}
@@ -42,12 +41,20 @@ td .rs::before{left:6px;font-size:13px} td .rs input{padding-left:18px}
 .mark{width:44px;height:44px;background:var(--ink);color:var(--plate);display:grid;place-items:center;
   font-weight:900;font-size:24px;line-height:1;flex:none}
 .brand{font-size:clamp(24px,5.6vw,34px);font-weight:900;letter-spacing:-.02em;line-height:1}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.homebtn{font-family:'Archivo',sans-serif;font-size:13px;font-weight:900;cursor:pointer;
+  background:transparent;color:var(--ink);border:2px solid var(--ink);padding:8px 14px;flex:none}
+.homebtn[aria-pressed=true]{background:var(--ink);color:var(--slip)}
+.homebtn:focus-visible,.seg button:focus-visible{outline:2px solid var(--oxide);outline-offset:2px}
+.homeline{font-size:16px;line-height:1.5}.homeline b{font-weight:900}
+.hometitle{font-size:22px;font-weight:900;letter-spacing:-.01em;margin:0 0 12px}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:18px}
+@media(max-width:560px){.seg{grid-template-columns:1fr}.seg button+button{border-left:2px solid var(--ink);border-top:0}}
 .seg button{font-family:inherit;text-align:left;padding:14px 15px;cursor:pointer;
   border:2px solid var(--ink);background:var(--paper);color:var(--ink)}
 .seg button+button{border-left:0}
-.seg button b{display:block;font-size:14.5px;font-weight:900;line-height:1.2}
-.seg button span{display:block;font-size:11.5px;color:var(--mute);margin-top:3px}
+.seg button b{display:block;font-size:17px;font-weight:900;line-height:1.2}
+.seg button span{display:block;font-size:13px;color:var(--mute);margin-top:4px}
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--slip)}
 .seg button[aria-pressed=true] span{color:#B9BDAE}
 .truckbar{display:flex;align-items:center;gap:11px;justify-content:space-between;
@@ -71,6 +78,17 @@ td .rs::before{left:6px;font-size:13px} td .rs input{padding-left:18px}
 .plate{display:inline-block;background:var(--plate);border:2px solid var(--ink);
   padding:11px 17px;font-weight:900;font-size:clamp(26px,6.6vw,40px);line-height:1}
 .cmp{margin-top:12px;font-size:14.5px;font-weight:600}
+.cmp:empty{display:none}
+.resgrid{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;align-items:stretch}
+@media(max-width:560px){.resgrid{grid-template-columns:1fr}}
+.verdict{border:2px solid var(--ink);padding:12px 14px;background:var(--paper)}
+.verdict.win{border-color:var(--moss)} .verdict.lose{border-color:var(--oxide)}
+.verdict .vbig{font-size:26px;font-weight:900;letter-spacing:-.01em;margin:2px 0 6px}
+.verdict.win .vbig{color:var(--moss)} .verdict.lose .vbig{color:var(--oxide)}
+.verdict .vsub{font-size:13px;line-height:1.45;color:var(--ink)}
+.bebox{border:2px solid var(--ink);padding:12px 14px}
+.besub{font-size:13px;margin-top:8px}
+.endrow{margin-top:18px;padding-top:14px;border-top:1px solid var(--rule)}
 .cmp .big{font-size:16px}.cmp b{font-weight:900}
 .work{font-size:12.5px;margin-top:15px;max-width:330px}
 .work div{display:flex;justify-content:space-between;gap:14px;padding:2.5px 0}
@@ -160,19 +178,91 @@ tr.dsoon td:first-child{box-shadow:inset 4px 0 0 var(--amber)}
 details{margin-top:15px;border-top:1px solid var(--rule);padding-top:13px}
 summary{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--mute);cursor:pointer}
 details input{font-size:16px}
-.ctitle{font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:var(--ink);
-  margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--rule)}
+.ctitle{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;color:var(--ink);
+  margin:20px 0 10px;padding-bottom:5px;border-bottom:1.5px solid var(--ink)}
 .derived{margin-top:14px;padding:10px 12px;background:var(--slip);border-left:3px solid var(--ink);font-size:12.5px}
 .derived b{font-weight:700}
+.costbody{margin-top:4px}
+.costbody input{font-size:16px}
+.grid>div{display:flex;flex-direction:column;justify-content:flex-end}
+.defrow{display:flex;align-items:center;gap:10px}
+.defrow>input,.defrow>.rs{flex:0 0 48%;width:48%}
+.defrow .rs input{width:100%}
+.defnote{font-size:12.5px;color:var(--mute);line-height:1.35}
+.costbody input::placeholder{font-size:13px;color:#A6AA9B}
+.grid.gtop>div{justify-content:flex-start}
+.svcwrap{margin-top:10px}
+.svctitle{display:block;font-size:14px;margin-bottom:8px}
+.svctab{font-size:12.5px;line-height:1.45;table-layout:fixed;width:100%}
+.svctab th,.svctab td{white-space:normal;overflow-wrap:anywhere}
+.svctab th:nth-child(1),.svctab td:nth-child(1){width:17%}
+.svctab th:nth-child(2),.svctab td:nth-child(2){width:27%}
+.svctab th{text-align:left;vertical-align:bottom;padding:6px 8px;font-size:10px}
+.svctab td{text-align:left;vertical-align:top;padding:8px;font-family:'Archivo',sans-serif}
+.svctab td b{font-weight:800}
+.svctab td i{color:var(--mute)}
+.svctab tr.grp td{border-top:1px solid var(--ink)}
+@media(max-width:640px){
+  .svctab thead{display:none}
+  .svctab,.svctab tbody,.svctab tr,.svctab td{display:block;width:100%}
+  .svctab tr{padding:8px 0;border-bottom:1px solid var(--rule)}
+  .svctab tr.grp{border-top:1px solid var(--ink);margin-top:4px}
+  .svctab tr.grp td{border-top:0}
+  .svctab{table-layout:auto}
+  .svctab td,.svctab td:nth-child(1),.svctab td:nth-child(2){border:0;padding:2px 0;width:100%;overflow-wrap:normal}
+  .svctab td.mk:empty{display:none}
+  .svctab td.mk{font-size:13.5px;padding-bottom:4px}
+  .svctab td:nth-child(3)::before,.svctab td:nth-child(4)::before{content:attr(data-l) ': ';color:var(--mute);font-size:11.5px}
+}
+.tiers{margin-top:14px;font-size:12.5px}
+.tiers>b{display:block;font-size:13px;margin-bottom:6px}
+.tiers dt{font-weight:700;margin-top:8px}
+.tiers dd{color:var(--mute);margin:2px 0 0}
+.ctrow{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.dlbtn{font-family:inherit;font-size:10.5px;letter-spacing:.06em;text-transform:none;font-weight:700;cursor:pointer;
+  background:var(--plate);color:var(--ink);border:1.5px solid var(--ink);padding:5px 9px;margin-bottom:2px;white-space:normal;text-align:left;max-width:58%;line-height:1.3}
+.dlbtn:active{filter:brightness(.92)}
+.tollq{display:flex;align-items:center;gap:18px;margin-top:10px;flex-wrap:wrap}
+.tollq .optline{margin:0}
+.tollql{font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--mute)}
+.warnnote{color:var(--oxide)}
+.freightpanel{border-top:6px solid var(--plate)}
+.route{margin:4px 0 14px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.route input[type=text]{width:100%;font-size:16px}
+.ptbox{margin-top:10px}
+.ptin{position:relative}
+.ptbtns{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}
+.locbtn{font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--ink);
+  border:1.5px solid var(--ink);padding:7px 10px;white-space:nowrap}
+.locbtn:active{background:var(--paper)}
+.sugg{position:absolute;left:0;right:0;top:100%;z-index:20;background:var(--paper);border:1.5px solid var(--ink);border-top:0;max-height:240px;overflow:auto}
+.sugg button{display:block;width:100%;text-align:left;font-family:inherit;font-size:14px;background:transparent;border:0;
+  border-bottom:1px solid var(--rule);padding:9px 10px;cursor:pointer;color:var(--ink)}
+.sugg button small{display:block;color:var(--mute);font-size:11.5px}
+.mapmodal{position:fixed;inset:0;z-index:100;background:rgba(22,21,15,.55);display:flex;align-items:center;justify-content:center;padding:14px}
+.mapmodal[hidden]{display:none}
+.mapbox{background:var(--paper);border:2px solid var(--ink);width:100%;max-width:640px;padding:12px}
+.maphead{font-size:14px;margin-bottom:8px}
+#pickMap{height:min(60vh,440px);width:100%;border:1px solid var(--ink)}
+button.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.maplink{font-size:13px;font-weight:700;color:var(--ink);align-self:center}
+#routeNote:empty{display:none}
+#routeNote.err{color:var(--oxide)}
+.shift{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:900;color:var(--oxide);margin:0 0 10px}
+.defnote a{color:var(--ink);font-weight:700}
+.fieldhint{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.4}
+.fuelnote{font-size:12px;color:var(--mute);margin-top:6px;min-height:0}
+.fuelnote:empty{display:none}
+input.miss{border-color:var(--oxide);box-shadow:0 0 0 1px var(--oxide)}
+.missmsg{color:var(--oxide);font-size:13.5px;line-height:1.5}
 .truckrow{display:flex;gap:8px;align-items:flex-end}
 .truckrow>div{flex:1;min-width:0}
 .truckrow select,.truckrow input{padding:9px 7px;font-size:16px}
 .truckrow .rs input{padding-left:22px}
-.costcall{display:block;width:100%;text-align:left;font-family:inherit;cursor:pointer;
+.costcall{display:block;width:100%;text-align:left;font-family:inherit;
   border:2px solid var(--oxide);background:#fff;color:var(--ink);padding:13px 15px;margin-top:14px}
 .costcall b{display:block;font-size:14.5px;font-weight:900;color:var(--oxide)}
 .costcall span{display:block;font-size:12.5px;color:var(--mute);margin-top:4px;line-height:1.45}
-.costcall:active{background:var(--paper)}
 .costcall.ok{border-color:var(--moss)}
 .costcall.ok b{color:var(--moss)}
 .hints{font-size:12px;color:var(--mute);margin-top:11px;max-width:76ch;line-height:1.5}
@@ -182,6 +272,7 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 <body><div class="wrap">
 
 <header>
+  <div class="toprow">
   <div class="brandrow">
     <div class="mark">N</div>
     <div>
@@ -189,57 +280,18 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
       <div class="eyebrow">Freight economics and compliance</div>
     </div>
   </div>
+  <button type="button" class="homebtn" id="goHome" aria-pressed="false">Home</button>
+  </div>
 </header>
 
-<div class="panel" id="truckPanel" hidden>
-  <h2>Your costs</h2>
-  <p class="sub">Asked the way you actually pay them — the bill, and how long it lasts.</p>
-  <details open>
-    <summary>Every number behind the rate</summary>
-    <p class="hints" style="margin:11px 0 0">Nobody knows their servicing in rupees per kilometre. Put in the bill and how long it lasts; the per-km figure works itself out.</p>
 
-    <div class="ctitle">Fuel</div>
-    <div class="grid">
-      <div><label for="fuel">Diesel per litre</label><div class="rs"><input class="num" id="fuel" type="number" step="1"></div></div>
-      <div><label for="defpc">DEF as % of diesel <i>0 for BS4</i></label><input class="num" id="defpc" type="number" step="0.5"></div>
-    </div>
-
-    <div class="ctitle">Tyres</div>
-    <div class="grid">
-      <div><label for="tyC">One tyre costs</label><div class="rs"><input class="num" id="tyC" type="number" step="500"></div></div>
-      <div><label for="tyN">How many tyres</label><input class="num" id="tyN" type="number" step="1"></div>
-      <div><label for="tyL">A tyre lasts <i>km</i></label><input class="num" id="tyL" type="number" step="5000"></div>
-    </div>
-
-    <div class="ctitle">Service and repairs</div>
-    <div class="grid">
-      <div><label for="svcC">One service costs</label><div class="rs"><input class="num" id="svcC" type="number" step="500"></div></div>
-      <div><label for="svcK">Service every <i>km</i></label><input class="num" id="svcK" type="number" step="1000"></div>
-      <div><label for="rep">Repairs in a month</label><div class="rs"><input class="num" id="rep" type="number" step="500"></div></div>
-    </div>
-
-    <div class="ctitle">Every trip</div>
-    <div class="grid">
-      <div><label for="drv">Driver and advance</label><div class="rs"><input class="num" id="drv" type="number" step="100"></div></div>
-      <div><label for="toll">Toll per km</label><div class="rs"><input class="num" id="toll" type="number" step="0.5"></div></div>
-      <div><label for="tollback">Toll reimbursed <i>1 yes, 0 no</i></label><input class="num" id="tollback" type="number" step="1" min="0" max="1"></div>
-    </div>
-
-    <div class="ctitle">Paid whether the truck moves or not</div>
-    <div class="grid">
-      <div><label for="emi">EMI in a month</label><div class="rs"><input class="num" id="emi" type="number" step="1000"></div></div>
-      <div><label for="ins">Insurance in a year</label><div class="rs"><input class="num" id="ins" type="number" step="1000"></div></div>
-      <div><label for="per">Permit, tax, fitness a year</label><div class="rs"><input class="num" id="per" type="number" step="1000"></div></div>
-      <div><label for="oth">Office and administrative a trip <i>zero if you do it yourself</i></label><div class="rs"><input class="num" id="oth" type="number" step="500"></div></div>
-      <div><label for="run">Days you run in a month</label><input class="num" id="run" type="number" step="1"></div>
-    </div>
-  </details>
-  <div class="btnrow" style="margin:15px 0 0"><button type="button" id="tDone">Done</button></div>
-</div>
-
+<div id="segHome" hidden>
+<p class="thesis homeline" style="margin:0 0 18px"><b>Built to make you money.</b> Own trucks? Know what every load really pays before you say yes. Planning to buy your first? See what a truck costs to run before you sign.</p>
+<div class="hometitle">What do you want to do?</div>
 <div class="seg">
-  <button id="sRate" aria-pressed="true"><b>Is your freight making you money?</b><span>Your cost against their rate</span></button>
+  <button id="sRate" aria-pressed="true"><b>Profit calculator</b><span>Is your freight making you money?</span></button>
   <button id="sComp" aria-pressed="false"><b>Papers and deadlines</b><span>Nothing expires on you</span></button>
+</div>
 </div>
 
 <div id="segRate">
@@ -251,13 +303,97 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
     <div><label for="ton">Tonnes</label><input class="num" id="ton" type="number" step="0.5"></div>
     <div><label for="mil">Average <i>km/L</i></label><input class="num" id="mil" type="number" step="0.05"></div>
   </div>
-  <button type="button" class="costcall" id="tEdit"></button>
+</div>
+<div class="panel" id="costPanel" style="margin-bottom:12px">
+  <h2>Your costs</h2>
+  <div class="costcall" id="tEdit" role="status" style="margin-top:10px"></div>
+  <div class="costbody">
+
+    <div class="ctitle">Fuel</div>
+    <div class="truckrow">
+      <div><label for="state">Your state</label><select id="state"></select></div>
+      <div><label for="fuel">Diesel per litre <span id="fuelStar" hidden>*</span></label><div class="rs"><input class="num" id="fuel" type="number" step="1"></div></div>
+    </div>
+    <div class="fuelnote" id="fuelNote"></div>
+    <div style="margin-top:11px">
+      <label for="defpc">DEF / Urea</label>
+      <div class="defrow">
+        <input class="num" id="defpc" type="number" step="0.005" value="0.025">
+        <span class="defnote">This is your per km consumption in litres</span>
+      </div>
+    </div>
+    <div style="margin-top:11px">
+      <label for="ureaP">Urea price per litre *</label>
+      <div class="defrow">
+        <div class="rs"><input class="num" id="ureaP" type="number" step="1" value="80"></div>
+        <span class="defnote">* This is a typical rate, which is subject to change.</span>
+      </div>
+    </div>
+
+    <div class="ctitle">Tyres</div>
+    <div class="grid">
+      <div><label for="tyC">One tyre costs</label><div class="rs"><input class="num" id="tyC" type="number" step="500" placeholder="15,000–25,000"></div></div>
+      <div><label for="tyN">How many tyres <i>fills from your truck</i></label><input class="num" id="tyN" type="number" step="1"></div>
+      <div><label for="tyL">A tyre lasts <i>km</i></label><input class="num" id="tyL" type="number" step="5000" placeholder="70,000–80,000"></div>
+    </div>
+    <p class="fieldhint">If you run underload, a tyre usually lasts 70,000 to 80,000 km. Overloading wears it out sooner.</p>
+
+    <div class="ctitle ctrow"><span>Service and repairs</span><button type="button" class="dlbtn" id="svcDl">Check your truck's service schedule first ↓</button></div>
+    <div class="grid gtop">
+      <div><label for="svcC">One service costs</label><div class="rs"><input class="num" id="svcC" type="number" step="500" placeholder="40,000–50,000"></div>
+        <p class="fieldhint">This includes replacing your clutch plate.</p></div>
+      <div><label for="svcK">Service every <i>km</i></label><input class="num" id="svcK" type="number" step="1000" placeholder="50,000–1,00,000">
+        <p class="fieldhint">The make of your truck defines it. Download the list above.</p></div>
+      <div><label for="rep">Repairs in a month</label><div class="rs"><input class="num" id="rep" type="number" step="500" placeholder="15,000–20,000"></div>
+        <p class="fieldhint">Anything which can be repaired by a quick stop at a workshop within a day or two.</p></div>
+    </div>
+
+    <div class="ctitle">Every trip</div>
+    <div class="grid">
+      <div><label for="drv">Driver and advance</label><div class="rs"><input class="num" id="drv" type="number" step="100"></div></div>
+    </div>
+    <div style="margin-top:11px">
+      <label for="toll">Toll per km</label>
+      <div class="defrow">
+        <div class="rs"><input class="num" id="toll" type="number" step="0.5"></div>
+        <span class="defnote">It is approx ₹9 per km</span>
+      </div>
+    </div>
+    <div class="tollq">
+      <span class="tollql">Toll reimbursed?</span>
+      <label class="optline"><input type="radio" name="tollr" id="tollback"> Yes</label>
+      <label class="optline"><input type="radio" name="tollr" id="tollNo" checked> No</label>
+    </div>
+    <div style="margin-top:11px">
+      <label for="oth">Office expense per trip</label>
+      <div class="defrow">
+        <div class="rs"><input class="num" id="oth" type="number" step="50"></div>
+        <span class="defnote">It is approx ₹100–200 per trip</span>
+      </div>
+    </div>
+
+    <div class="ctitle">Paid whether the truck moves or not</div>
+    <div class="grid">
+      <div><label for="emi">EMI in a month</label><div class="rs"><input class="num" id="emi" type="number" step="1000"></div></div>
+      <div><label for="ins">Insurance in a year</label><div class="rs"><input class="num" id="ins" type="number" step="1000"></div></div>
+    </div>
+    <div style="margin-top:11px">
+      <label for="per">Permit, tax, fitness a year</label>
+      <div class="defrow">
+        <div class="rs"><input class="num" id="per" type="number" step="1000"></div>
+        <span class="defnote">Check your last receipts or your RTO. Road tax for your truck: <a href="https://vahan.parivahan.gov.in/vahanservice/" target="_blank" rel="noopener">Vahan portal</a>, pick your state and enter the vehicle number.</span>
+      </div>
+    </div>
+    <div style="margin-top:11px">
+      <label for="run">Days you run in a month</label>
+      <div class="defrow">
+        <input class="num" id="run" type="number" step="1">
+        <span class="defnote warnnote">⚠ Put 25, not 30. Your truck runs 25 days a month. Festivals, holidays, monsoon and hill or border closures take the rest.</span>
+      </div>
+    </div>
+  </div>
   <div class="derived num" id="derived"></div>
 </div>
-  <div class="tabs sub">
-    <button id="tOne" aria-pressed="true">One trip</button>
-    <button id="tMany" aria-pressed="false">Whole contract</button>
-  </div>
 </div>
 
 <div id="segComp" hidden>
@@ -270,63 +406,56 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 </div>
 
 <!-- ONE TRIP -->
-<div class="panel" id="paneOne">
-  <h2>One trip</h2>
-  <p class="sub">Distance is the run you are quoting for, A to B.</p>
+<div class="panel freightpanel" id="paneOne">
+  <div class="shift">Your costs are done. Now, what are you being paid?</div>
+  <h2>Put your freight in</h2>
+  <p class="sub">The load you have been offered: how far, how long, and the rate.</p>
+  <div class="route">
+    <div class="ptbox">
+      <label for="ptA">Loading point</label>
+      <div class="ptin"><input id="ptA" type="text" autocomplete="off" placeholder="Type a town or place">
+        <div class="sugg" id="sugA" hidden></div></div>
+      <div class="ptbtns">
+        <button type="button" class="locbtn" data-loc="A">📍 Use my location</button>
+        <button type="button" class="locbtn" data-map="A">🗺 Pick on map</button>
+      </div>
+    </div>
+    <div class="ptbox">
+      <label for="ptB">Unloading point</label>
+      <div class="ptin"><input id="ptB" type="text" autocomplete="off" placeholder="Type a town or place">
+        <div class="sugg" id="sugB" hidden></div></div>
+      <div class="ptbtns">
+        <button type="button" class="locbtn" data-loc="B">📍 Use my location</button>
+        <button type="button" class="locbtn" data-map="B">🗺 Pick on map</button>
+      </div>
+    </div>
+    <div class="btnrow" style="margin:12px 0 0">
+      <button type="button" id="findDist">Find distance</button>
+      <a class="maplink" id="mapLink" href="#" target="_blank" rel="noopener" hidden>See best route on Google Maps ↗</a>
+    </div>
+    <p class="fieldhint" id="routeNote"></p>
+  </div>
   <div class="truckrow">
     <div><label for="lead">Distance <i>A to B</i></label><input class="num" id="lead" type="number" step="10"></div>
-    <div><label for="days">Trip time</label><input class="num" id="days" type="number" step="0.5" min="0.5"></div>
-    <div><label for="rate">Rate offered <i>blank if none</i></label><div class="rs"><input class="num" id="rate" type="number" step="10" placeholder="—"></div></div>
+    <div><label for="days">Trip time <i>days</i></label><input class="num" id="days" type="number" step="0.5" min="0.5"></div>
+    <div><label for="rate">Rate offered <i>per tonne</i></label><div class="rs"><input class="num" id="rate" type="number" step="10" placeholder="—"></div></div>
   </div>
-  <label class="optline"><input type="checkbox" id="rtn"> Truck comes back empty — charge the return leg too</label>
-  <div class="btnrow" style="margin:15px 0 0"><button type="button" id="goCalc">Let&rsquo;s calculate</button><button type="button" class="ghost" id="resetAll">Start again</button></div>
-  <div class="answer">
-    <div class="tag">BREAKEVEN RATE</div>
-    <div class="plate" id="plate">—</div>
-    <div class="cmp" id="cmp"></div>
-    <div class="work num" id="work"></div>
-  </div>
-</div>
-
-<!-- WHOLE CONTRACT -->
-<div class="panel" id="paneMany" hidden>
-  <h2>Whole contract</h2>
-  <p class="sub">Paste your destination, your km and your rate. You get the rate to negotiate on.</p>
-
-  <div class="drop">
-    <b>Bring in the freight list</b>
-    <span>Excel or CSV — most of the columns don't matter, you'll pick the three that do</span>
-    <input type="file" id="file" accept=".xlsx,.xls,.csv,.tsv,.txt">
-  </div>
-  <div class="drop">
-    <b>Or photograph it</b>
-    <span>A printed sheet or a screenshot</span>
-    <input type="file" id="photo" accept="image/*" capture="environment">
-    <div id="ocr" class="ocr" hidden></div>
-  </div>
-  <div id="mapper" class="mapper" hidden>
-    <div class="grid g3">
-      <div><label for="cDest">Destination</label><select id="cDest"></select></div>
-      <div><label for="cLead">Km</label><select id="cLead"></select></div>
-      <div><label for="cRate">Rate</label><select id="cRate"></select></div>
+  <p class="fieldhint">Trip time: your truck should hold 50 km an hour. With loading and unloading waits, 500 km takes 2 days to reach. Leave it blank and we work it out this way.</p>
+  <label class="optline"><input type="checkbox" id="rtn"> Coming back empty on the same route — count the return trip too</label>
+  <div class="btnrow" style="margin:15px 0 0"><button type="button" id="goCalc">Let&rsquo;s calculate</button></div>
+  <div class="cmp" id="cmp"></div>
+  <div class="answer" id="answer" hidden>
+    <div class="resgrid">
+      <div class="verdict" id="verdict"></div>
+      <div class="bebox">
+        <div class="tag">Breakeven rate: quote at least</div>
+        <div class="plate" id="plate">—</div>
+        <div class="besub" id="beSub"></div>
+      </div>
     </div>
-    <p class="hints" id="mapnote"></p>
+    <div class="work num" id="work"></div>
+    <div class="btnrow endrow"><button type="button" id="dlXls">Download as Excel ↓</button><button type="button" class="ghost" id="resetAll">Start again</button></div>
   </div>
-  <div class="btnrow">
-    <button type="button" id="demo">Load an example</button>
-    <button type="button" id="pasteBtn">Paste</button>
-    <button type="button" id="addBtn">+ Add row</button>
-    <button type="button" id="clearBtn">Clear</button>
-  </div>
-
-  <div class="tally" id="tally"></div>
-  <div class="scroll"><table>
-    <thead><tr>
-      <th>Destination</th><th>Km</th><th>Rate ₹/T</th><th>Days</th>
-      <th>Cost/km</th><th>Ask ₹/T</th><th>Per trip</th><th>Verdict</th><th></th>
-    </tr></thead><tbody id="rows"></tbody>
-  </table></div>
-  <p class="hints" id="summary"></p>
 </div>
 
 <!-- PAPERS -->
@@ -455,17 +584,20 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
   <p class="hints">This is a picture of the message, not a live one. Sending it needs a server holding your number and a WhatsApp or SMS channel — that is the first backend job after deployment.</p>
 </div>
 
-<div class="crossbar" id="crossBar" hidden>
-  <div id="crossText"><b>While you are here</b> — check what your next load actually has to pay.</div>
-  <button type="button" id="goRate">Work out the rate</button>
-</div>
 
-<footer>
+<footer id="rateNote">
   Cost is fuel at your average, tyres, toll, DEF and parts per kilometre, driver and advance per trip,
   and your fixed cost for every day the vehicle is held. The rate shown is the point at which the trip stops losing money —
-  anything above it is yours. Leave the days column blank and it estimates the trip time for you.
+  anything above it is yours. Leave trip time blank and it estimates it for you.
 </footer>
 
+</div>
+<div class="mapmodal" id="mapModal" hidden>
+  <div class="mapbox">
+    <div class="maphead"><b id="mapTitle">Tap the map to choose the point</b></div>
+    <div id="pickMap"></div>
+    <div class="btnrow" style="margin:10px 0 0"><button type="button" id="mapOk" disabled>Use this point</button><button type="button" class="ghost" id="mapCancel">Cancel</button></div>
+  </div>
 </div>
 <script>
 const CFG=[
@@ -488,6 +620,59 @@ const sel=$('cfg');
 CFG.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.n;sel.appendChild(o);});
 sel.value='';
 const TOUCHED=new Set();
+
+/* ===== DIESEL PRICES: the only place to edit when the pump price changes =====
+   Put the price per litre after the state name, e.g. 'Gujarat': 94.5,
+   null means no price set yet. Change DIESEL_ASOF to the date you updated them. */
+const DIESEL_ASOF = '25 Sept 2026';  /* for your own record; not shown on the page */
+const DIESEL = {
+  'Andaman And Nicobar':     84.56,
+  'Andhra Pradesh':          105.36,
+  'Arunachal Pradesh':       89.05,
+  'Assam':                   98.42,
+  'Bihar':                   101.08,
+  'Chandigarh':              89.47,
+  'Chhattisgarh':            102.34,
+  'Dadra And Nagar Haveli':  95.63,
+  'Daman And Diu':           96.35,
+  'Delhi':                   95.20,
+  'Goa':                     96.01,
+  'Gujarat':                 98.98,
+  'Haryana':                 95.60,
+  'Himachal Pradesh':        92.68,
+  'Jammu And Kashmir':       93.64,
+  'Jharkhand':               100.93,
+  'Karnataka':               98.23,
+  'Kerala':                  103.42,
+  'Madhya Pradesh':          100.03,
+  'Maharashtra':             99.97,
+  'Manipur':                 92.66,
+  'Meghalaya':               92.90,
+  'Mizoram':                 95.67,
+  'Nagaland':                97.38,
+  'Odisha':                  102.17,
+  'Puducherry':              94.08,
+  'Punjab':                  95.15,
+  'Rajasthan':               98.23,
+  'Tamil Nadu':              101.12,
+  'Telangana':               103.49,
+  'Uttar Pradesh':           95.85,
+  'Uttarakhand':             97.16,
+  'West Bengal':             100.22,
+};
+/* ============================================================================= */
+const stSel=$('state');
+[['','Choose state'],...Object.keys(DIESEL).map(k=>[k,k]),['other','Other state']]
+  .forEach(([val,txt])=>{const o=document.createElement('option');o.value=val;o.textContent=txt;stSel.appendChild(o);});
+stSel.onchange=()=>{
+  const k=stSel.value, p=DIESEL[k];
+  $('fuelStar').hidden=!p;
+  if(p){ $('fuel').value=p; TOUCHED.add('fuel');
+    $('fuelNote').textContent='* This is a typical rate as per the state, which is subject to change.'; }
+  else if(k){ $('fuelNote').textContent='No rate set for this state yet. Type your pump price.'; }
+  else { $('fuelNote').textContent=''; }
+  calc();
+};
 function setIf(id,val){ if(!TOUCHED.has(id)) $(id).value=val; }
 function seed(){
   if(sel.value===''){ calc(); return; }
@@ -497,15 +682,15 @@ function seed(){
   setIf('tyN',c.tyN);
   calc();
 }
-function estDays(lead){ const s=250; /* only a placeholder when turnaround is left blank */
+function estDays(lead){ const s=250; /* 50 km/h with waiting: 500 km = 2 days. Used only when trip time is left blank */
   const d=($('rtn')&&$('rtn').checked)?lead*2:lead;
-  return Math.max(0.5, Math.round((d/s+1)*2)/2); }
+  return Math.max(0.5, Math.ceil((d/s)*2)/2); }
 function rates(){
   const fuelKm = v('mil')>0 ? v('fuel')/v('mil') : 0;
-  const defKm  = fuelKm*v('defpc')/100;
+  const defKm  = v('defpc')*v('ureaP');  /* urea litres per km x price per litre */
   const tyreKm = v('tyL')>0 ? v('tyN')*v('tyC')/v('tyL') : 0;
   const svcKm  = v('svcK')>0 ? v('svcC')/v('svcK') : 0;
-  const tollKm = v('tollback')?0:v('toll');
+  const tollKm = $('tollback').checked?0:v('toll');
   /* repairs are a monthly bill and there is no km-per-day to spread them over,
      so they sit on the day rate with EMI, insurance and permits */
   const fixDay = (v('emi')+v('ins')/12+v('per')/12+v('rep'))/(v('run')||26);
@@ -519,9 +704,15 @@ function trip(lead,daysIn){
   const cost=fuel+perKm+v('drv')+v('oth')+days*R.fixDay;
   return {km,days,fuel,perKm,cost,R};
 }
-let COSTSDONE=false;
-const ASKCOST=`<b>These three are not the whole cost.</b><span>Fourteen more numbers sit behind the rate &mdash; tyres, service, driver, toll, EMI, insurance, permits. Nothing here is guessed for you. <b style="display:inline;font-size:12.5px">Put your own in &rarr;</b></span>`;
-const OWNCOST=`<b>Running on your own numbers.</b><span>Anything changed &mdash; a diesel move, a new tyre price, an EMI that shifts? <b style="display:inline;font-size:12.5px">Change them &rarr;</b></span>`;
+let COSTSDONE=false, TRIED=false;
+const NEED={ton:'Tonnes',mil:'Average',fuel:'Diesel per litre',tyC:'One tyre costs',tyN:'How many tyres',tyL:'A tyre lasts',
+  svcC:'One service costs',svcK:'Service every',drv:'Driver and advance',emi:'EMI in a month',ins:'Insurance in a year',
+  per:'Permit, tax, fitness',run:'Days you run in a month',ureaP:'Urea price per litre'};
+const missing=()=>{const m=Object.keys(NEED).filter(id=>id!=='ureaP'&&$(id).value==='');
+  if(v('defpc')>0&&$('ureaP').value==='') m.push('ureaP'); return m;};
+function markMissing(list){ Object.keys(NEED).concat(['lead']).forEach(id=>$(id).classList.toggle('miss',TRIED&&list.includes(id))); }
+const ASKCOST=`<b>These three are not the whole cost.</b><span>Most trucks lose money on costs the owner never adds up &mdash; a tyre, a service, the days the truck stands at a gate. Put in what you actually pay, once, and you will know the lowest rate you can take before you say yes. Not sure of a number? Each box shows the usual range to guide you.</span>`;
+const OWNCOST=`<b>Running on your own numbers.</b><span>Anything changed &mdash; a diesel move, a new tyre price, an EMI that shifts? Change it below and the rate follows.</span>`;
 let LASTSTATE=null;
 function showDerived(){
   const cc=$('tEdit');
@@ -531,184 +722,54 @@ function showDerived(){
     LASTSTATE=COSTSDONE;
   }
   if(!COSTSDONE){
-    $('derived').innerHTML=`<b>Want to know your cost per kilometre?</b> Click on <b>Put your own in</b> above.`;
+    $('derived').innerHTML=`<b>Your cost per kilometre</b> appears here once all your costs above are filled in.`;
     return;
   }
   const R=rates();
   $('derived').innerHTML=`Your cost is <b>${money(R.runKm)} a km</b> on the road
     — fuel ${money(R.fuelKm)}, tyres ${money(R.tyreKm)}, service ${money(R.svcKm)},
-    DEF ${money(R.defKm)}${R.tollKm?`, toll ${money(R.tollKm)}`:''} — and
+    DEF / urea ₹${(+R.defKm.toFixed(3)).toLocaleString('en-IN')}${R.tollKm?`, toll ${money(R.tollKm)}`:''} — and
     <b>${money(R.fixDay)} a day</b> the vehicle is held, which carries EMI, insurance, permits and repairs.`;
 }
 const ask=cost=>{const t=v('ton');return t>0?Math.ceil(cost/t):0;};
 
 /* ---------- one trip ---------- */
 function calcOne(){
-  const t=trip(v('lead'),v('days')), a=ask(t.cost), offered=v('rate');
-  $('plate').textContent = v('ton')>0 && v('lead')>0 ? money(a)+' / tonne' : '—';
-  const ton=v('ton');
-  $('cmp').innerHTML = (v('lead')>0&&ton>0)
-    ? `<div class="big">${money(a)} × ${ton} T = <b>${money(a*ton)}</b> for the trip</div>` +
-      (offered>0 ? (offered>=a
-        ? `<div style="color:var(--moss);margin-top:7px">Offered ${money(offered)} — ${money(offered*ton)} in, <b>${money(offered*ton-t.cost)} left over</b>.</div>`
-        : `<div style="color:var(--oxide);margin-top:7px">Offered ${money(offered)} — ${money(offered*ton)} in against ${money(t.cost)} of cost. <b>Short ${money(t.cost-offered*ton)}</b>.</div>`) : '')
-    : '';
+  const miss=missing(); if(v('lead')<=0) miss.push('lead');
+  COSTSDONE = !miss.some(id=>id!=='ton'&&id!=='mil'&&id!=='lead');
+  markMissing(miss);
+  if(miss.length){
+    $('answer').hidden=true; $('plate').textContent='—'; $('work').innerHTML='';
+    $('cmp').innerHTML = TRIED ? `<div class="missmsg"><b>Still needed for your rate:</b> ${miss.map(id=>id==='lead'?'Distance':NEED[id]).join(', ')}. They are marked in red.</div>` : '';
+    showDerived(); return;
+  }
+  const t=trip(v('lead'),v('days')), a=ask(t.cost), offered=v('rate'), ton=v('ton');
+  $('answer').hidden = !TRIED;
+  $('cmp').innerHTML='';
+  $('plate').textContent = money(a)+' / tonne';
+  $('beSub').innerHTML = `${money(a)} × ${ton} T = <b>${money(a*ton)}</b> for the trip`;
+  const vd=$('verdict');
+  if(offered>0){
+    const inn=offered*ton, pl=inn-t.cost;
+    vd.className='verdict '+(pl>=0?'win':'lose');
+    vd.innerHTML=`<div class="tag">Your freight: ${money(offered)} / tonne</div>
+      <div class="vbig">${pl>0?'Profit '+money(pl):pl<0?'Loss '+money(-pl):'Breaks even'}</div>
+      <div class="vsub">${money(offered)} × ${ton} T = ${money(inn)} in, against ${money(t.cost)} cost of the trip.</div>`;
+  } else {
+    vd.className='verdict';
+    vd.innerHTML=`<div class="tag">Your freight</div><div class="vsub">Put the rate offered per tonne above to see your profit or loss on this load.</div>`;
+  }
   $('work').innerHTML = v('lead')>0 ? `
     <div><span>Fuel — ${t.km} km</span><span>${money(t.fuel)}</span></div>
     <div><span>Tyres, service, DEF${t.R.tollKm?', toll':''}</span><span>${money(t.perKm)}</span></div>
     <div><span>Driver and advance</span><span>${money(v('drv'))}</span></div>
-    ${v('oth')>0?`<div><span>Office and administrative</span><span>${money(v('oth'))}</span></div>`:''}
+    ${v('oth')>0?`<div><span>Office expense</span><span>${money(v('oth'))}</span></div>`:''}
     <div><span>EMI, insurance, permits, repairs — ${t.days} days</span><span>${money(t.days*t.R.fixDay)}</span></div>
     <div class="rule"><span>Cost of the trip</span><span>${money(t.cost)}</span></div>` : '';
   showDerived();
 }
 
-/* ---------- whole contract ---------- */
-let ROWS=[{name:'',lead:'',rate:'',days:''}];
-function rowHTML(r,i){return `<tr data-i="${i}">
-  <td><input class="dest" data-f="name" value="${(r.name||'').replace(/"/g,'&quot;')}" placeholder="Destination"></td>
-  <td><input data-f="lead" type="number" inputmode="numeric" value="${r.lead||''}" placeholder="km"></td>
-  <td><div class="rs"><input data-f="rate" type="number" inputmode="numeric" value="${r.rate||''}" placeholder="0"></div></td>
-  <td><input data-f="days" type="number" inputmode="decimal" step="0.5" value="${r.days||''}" placeholder="${r.lead>0?estDays(r.lead):'—'}"></td><td class="c-ckm">—</td><td class="c-ask">—</td>
-  <td class="c-net">—</td><td class="verd c-verd">—</td>
-  <td class="del"><button type="button">×</button></td></tr>`;}
-function render(){
-  $('rows').innerHTML=ROWS.map(rowHTML).join('');
-  $('rows').querySelectorAll('tr').forEach(tr=>{
-    const i=+tr.dataset.i;
-    tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{
-      ROWS[i][e.target.dataset.f]=e.target.dataset.f==='name'?e.target.value:(+e.target.value||'');
-      if(e.target.dataset.f==='lead'){const d=tr.querySelector('[data-f=days]'); if(d&&!d.value) d.placeholder=estDays(ROWS[i].lead||0);}
-      scoreRow(i); tally();
-    }));
-    tr.querySelector('.del button').onclick=()=>{
-      ROWS.splice(i,1); if(!ROWS.length)ROWS=[{name:'',lead:'',rate:'',days:''}]; render();
-    };
-  });
-  tally();
-}
-function scoreRow(i){
-  const tr=$('rows').querySelector(`tr[data-i="${i}"]`); if(!tr) return null;
-  const r=ROWS[i], set=(c,t)=>{const e=tr.querySelector(c); if(e)e.textContent=t;};
-  if(!(r.lead>0&&r.rate>0&&v('ton')>0)){
-    tr.className=''; ['.c-days','.c-ckm','.c-ask','.c-net','.c-verd'].forEach(c=>set(c,'—')); return null;
-  }
-  const t=trip(r.lead,r.days), a=ask(t.cost), net=r.rate*v('ton')-t.cost;
-  const cls = r.rate>=a ? 'g' : (r.rate*v('ton')>=t.cost ? 'a' : 'r');
-  tr.className=cls;
-  set('.c-ckm',money(t.cost/t.km)); set('.c-ask',money(a));
-  const ne=tr.querySelector('.c-net');
-  ne.textContent=(net>=0?'+':'−')+money(Math.abs(net));
-  ne.style.color=net>=0?'var(--moss)':'var(--oxide)';
-  set('.c-verd', cls==='g'?'TAKE':cls==='a'?'THIN':'ASK '+money(Math.ceil(a)));
-  return {name:r.name||'This one',net,days:t.days,cls};
-}
-function tally(){
-  let g=0,a=0,r=0,n=0,best=null,worst=null;
-  ROWS.forEach((_,i)=>{const s=scoreRow(i); if(!s)return; n++;
-    s.cls==='g'?g++:s.cls==='a'?a++:r++;
-    if(!best||s.net>best.net)best=s; if(!worst||s.net<worst.net)worst=s;});
-  $('tally').innerHTML = n?`<span class="chip g">${g} take</span><span class="chip a">${a} thin</span><span class="chip r">${r} below cost</span>`:'';
-  $('summary').innerHTML = (n&&best)
-    ? `Best is <b>${best.name}</b> at ${money(best.net/best.days)} a day. Worst is <b>${worst.name}</b> — one truck there for a month costs about ${money(Math.abs(worst.net)*(26/worst.days))}.`
-    : 'Add a destination, its one-way km and the rate.';
-}
-function loadRows(list){ ROWS=list.length?list:[{name:'',lead:'',rate:'',days:''}]; render(); }
-function parseText(txt){
-  return txt.split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>{
-    const p=l.split(/[\t,;]+|\s{2,}|\s+/).filter(Boolean);
-    const nums=p.filter(x=>/^[\d.]+$/.test(x)).map(Number);
-    const name=p.filter(x=>!/^[\d.]+$/.test(x)).join(' ');
-    return nums.length>=2?{name:name||'—',lead:nums[0],rate:nums[1]}:null;
-  }).filter(Boolean);
-}
-function calc(){ calcOne(); tally(); if(document.getElementById('tSum')) truckSummary(); }
-
-/* import */
-let RAW=null;
-$('file').onchange=e=>{const f=e.target.files[0]; if(f) readFile(f);};
-function readFile(f){
-  const r=new FileReader(), csv=/\.(csv|tsv|txt)$/i.test(f.name);
-  r.onload=()=>{ try{
-    RAW = csv
-      ? r.result.split(/\r?\n/).filter(l=>l.trim()).map(l=>l.split(/\t|,/).map(c=>c.replace(/^"|"$/g,'').trim()))
-      : XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(r.result),{type:'array'}).Sheets[
-          XLSX.read(new Uint8Array(r.result),{type:'array'}).SheetNames[0]],{header:1,defval:''})
-          .filter(row=>row.some(c=>String(c).trim()));
-    buildMapper(f.name);
-  }catch(err){ alert('Could not read that file. Saving it as CSV usually works.'); } };
-  csv ? r.readAsText(f) : r.readAsArrayBuffer(f);
-}
-function buildMapper(fname){
-  if(!RAW||!RAW.length)return;
-  const w=Math.max(...RAW.map(r=>r.length)), head=RAW[0].map(c=>String(c).trim());
-  const hasHead=head.some(c=>c&&isNaN(Number(c)));
-  const opts=[]; for(let i=0;i<w;i++) opts.push(`<option value="${i}">${hasHead&&head[i]?head[i]:'Column '+(i+1)}</option>`);
-  ['cDest','cLead','cRate'].forEach(id=>$(id).innerHTML=opts.join(''));
-  const body=hasHead?RAW.slice(1):RAW, st=[];
-  for(let i=0;i<w;i++){
-    const nums=body.map(r=>String(r[i]??'').replace(/[^\d.]/g,'')).filter(x=>x!=='').map(Number).filter(n=>!isNaN(n));
-    const txt=body.filter(r=>String(r[i]??'').trim()&&isNaN(Number(String(r[i]).replace(/[^\d.]/g,'')))).length;
-    st.push({i,n:nums.length,avg:nums.length?nums.reduce((a,b)=>a+b,0)/nums.length:0,txt});
-  }
-  const d=[...st].sort((a,b)=>b.txt-a.txt)[0];
-  const nums=st.filter(s=>s.i!==d.i&&s.n>=Math.max(1,body.length*0.5)).sort((a,b)=>a.avg-b.avg);
-  $('cDest').value=d.i; if(nums.length>=2){$('cLead').value=nums[0].i;$('cRate').value=nums[1].i;}
-  $('mapper').hidden=false;
-  $('mapnote').textContent=`${fname} — ${body.length} rows. Pick the three columns that matter and ignore the rest.`;
-  applyMap();
-}
-function applyMap(){
-  if(!RAW)return;
-  const d=+$('cDest').value,l=+$('cLead').value,t=+$('cRate').value;
-  const head=RAW[0].map(c=>String(c).trim()), body=head.some(c=>c&&isNaN(Number(c)))?RAW.slice(1):RAW;
-  const num=x=>Number(String(x??'').replace(/[^\d.]/g,''));
-  loadRows(body.map(r=>{const nm=String(r[d]??'').trim(),a=num(r[l]),b=num(r[t]);
-    return (nm&&a>0&&b>0)?{name:nm,lead:a,rate:b}:null;}).filter(Boolean));
-}
-['cDest','cLead','cRate'].forEach(id=>$(id).addEventListener('change',applyMap));
-
-$('photo').onchange=async e=>{
-  const f=e.target.files[0]; if(!f)return;
-  const box=$('ocr'); box.hidden=false; box.className='ocr'; box.textContent='Reading…';
-  try{
-    const b64=await new Promise((res,rej)=>{const r=new FileReader();
-      r.onload=()=>res(r.result.split(',')[1]); r.onerror=()=>rej(); r.readAsDataURL(f);});
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:f.type||'image/jpeg',data:b64}},
-        {type:'text',text:'This is a freight rate list for a trucking company. Return ONLY a JSON array, no prose or markdown, like [{"destination":"Alirajpur","lead":201,"rate":782}]. lead is the one-way distance in km, rate is the freight per tonne. Use the first rate column if several.'}]}]})});
-    const data=await resp.json();
-    const txt=(data.content||[]).map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
-    const rows=JSON.parse(txt);
-    loadRows(rows.map(r=>({name:r.destination,lead:+r.lead||0,rate:+r.rate||0})));
-    box.textContent=rows.length+' rows read — check them below.';
-  }catch(err){ box.className='ocr err'; box.textContent='Could not read that photo here. Upload the file instead.'; }
-};
-
-$('demo').onclick=()=>loadRows(parseText(`Alirajpur, 201, 782
-Bakhatgarh, 244, 920
-Borjhar, 182, 717
-Borkundiya, 185, 724
-Chaktala, 236, 892
-Chandar Muli, 232, 880
-Chandpur, 215, 828
-Dabdi, 214, 826
-Kaththiwara, 203, 788
-Kulwat, 229, 868
-Motibadoi, 208, 805
-Nanpur, 201, 782
-Phoolmal, 236, 892
-Sondwa, 227, 861`));
-$('addBtn').onclick=()=>{ROWS.push({name:'',lead:'',rate:'',days:''});render();
-  const e=$('rows').querySelectorAll('input.dest'); e[e.length-1].focus();};
-$('clearBtn').onclick=()=>{RAW=null;$('mapper').hidden=true;$('ocr').hidden=true;loadRows([]);};
-$('pasteBtn').onclick=async()=>{ try{
-    const t=await navigator.clipboard.readText();
-    if(t&&t.trim()) loadRows(ROWS.filter(r=>r.name||r.lead).concat(parseText(t)));
-    else alert('Clipboard is empty.');
-  }catch(err){ alert('This app blocks clipboard reading. Long-press a box and choose Paste, or open the file in Chrome.'); } };
+function calc(){ calcOne(); if(document.getElementById('tSum')) truckSummary(); }
 
 /* ---------- papers ---------- */
 let VEH=[];
@@ -1011,27 +1072,25 @@ function findHelp(q){
 document.querySelectorAll('.hrow button').forEach(b=>b.onclick=()=>findHelp(b.dataset.q));
 
 /* tabs */
-let SEG='rate', SUB={rate:'one', comp:'di'}, TRUCKOPEN=false;
+let SEG='home', SUB={rate:'one', comp:'di'}, TRUCKOPEN=false;
 function truckSummary(){ /* the bar stays a plain prompt */ }
 function paint(){
+  $('segHome').hidden = SEG!=='home';
+  $('goHome').setAttribute('aria-pressed',SEG==='home');
   $('segRate').hidden = SEG!=='rate';
+  $('rateNote').hidden = SEG!=='rate';
   $('segComp').hidden = SEG!=='comp';
   $('sRate').setAttribute('aria-pressed',SEG==='rate');
   $('sComp').setAttribute('aria-pressed',SEG==='comp');
-  $('truckPanel').hidden = !(SEG==='rate' && TRUCKOPEN);
 
   const R = SEG==='rate' && !TRUCKOPEN;
-  $('paneOne').hidden  = !(R && SUB.rate==='one');
-  $('paneMany').hidden = !(R && SUB.rate==='many');
+  $('paneOne').hidden  = !R;
   const C = SEG==='comp';
   $('paneDI').hidden   = !(C && SUB.comp==='di');
   $('paneEwb').hidden  = !(C && SUB.comp==='ewb');
   $('paneDoc').hidden  = !(C && SUB.comp==='doc');
   $('paneHelp').hidden = !(C && SUB.comp==='help');
-  $('crossBar').hidden = !C;
 
-  $('tOne').setAttribute('aria-pressed',SUB.rate==='one');
-  $('tMany').setAttribute('aria-pressed',SUB.rate==='many');
   [['tDoc2','di'],['tEwb','ewb'],['tDoc','doc'],['tHelp','help']]
     .forEach(([b,k])=>$(b).setAttribute('aria-pressed',SUB.comp===k));
 
@@ -1039,33 +1098,201 @@ function paint(){
   if(C && SUB.comp==='ewb') drawEwb();
 }
 const goTop=()=>window.scrollTo({top:0,behavior:'smooth'});
-$('sRate').onclick=()=>{SEG='rate';paint();};
-$('sComp').onclick=()=>{SEG='comp';TRUCKOPEN=false;paint();};
-$('tOne').onclick=()=>{SUB.rate='one';TRUCKOPEN=false;paint();};
-$('tMany').onclick=()=>{SUB.rate='many';TRUCKOPEN=false;paint();};
+$('sRate').onclick=()=>{SEG='rate';paint();goTop();};
+$('sComp').onclick=()=>{SEG='comp';TRUCKOPEN=false;paint();goTop();};
+
+/* ===== Service intervals list: downloads as a spreadsheet (opens in Excel / Google Sheets) ===== */
+const SVC_ROWS=[["Tata Motors", "LCVs & Small CVs (e.g., Tata Ace, Zip, Magic)", "Every 10,000 km or 4 months", "Every 10,000 to 20,000 km"], ["Tata Motors", "M&HCVs / Heavy Trucks (e.g., Prima, Signa)", "Every 20,000 km (Greasing & general inspection)", "Every 40,000 to 80,000 km (depends on the engine tech)"], ["Ashok Leyland", "LCVs (e.g., Dost, BADA DOST, Partner)", "Every 5,000 km or 3 months", "Every 10,000 to 20,000 km"], ["Ashok Leyland", "M&HCVs / Heavy Trucks (e.g., AVTR, BOSS 1115HB)", "Every 20,000 to 30,000 km", "Up to 80,000 km (Extended drain for high-efficiency models)"], ["Mahindra & Mahindra", "Small CVs & Pickups (e.g., Bolero Maxx, Supro, Jeeto)", "Every 10,000 km", "Every 20,000 km (under severe conditions, reduce to 5,000 km)"], ["Mahindra & Mahindra", "Heavy Commercial Trucks (e.g., Blazo X, Furio)", "Every 30,000 km (First check at 10,000 km)", "Up to 80,000 to 120,000 km for high-grade synthetic gear/hub oils"], ["Eicher Trucks & Buses", "ICVs & Light Trucks (e.g., Pro 2000 & 3000 series)", "Every 10,000 to 15,000 km", "Every 30,000 to 40,000 km"], ["Eicher Trucks & Buses", "Heavy Duty Trucks (e.g., Pro 6000 & 8000 series)", "Every 20,000 to 40,000 km", "Every 50,000 to 60,000 km (Filter replacements match this cycle)"], ["BharatBenz", "Heavy Duty Tippers & Tractors", "Every 25,000 km", "Every 50,000 to 100,000 km (Depends on long-haul vs mining usage)"], ["Maruti Suzuki Commercial", "Mini Trucks (e.g., Super Carry)", "Every 5,000 km", "Every 10,000 km"]];
+const SVC_TIERS=[["Every 5,000–10,000 km: basic check and greasing", "Chassis greasing, air filter cleaning, tyre rotation, brake pad and lining checks."], ["Every 20,000–40,000 km: intermediate service", "Engine oil and oil filter change, fuel filter replacement, clutch adjustment."], ["Every 50,000–1,00,000 km: major overhaul", "Gearbox and differential oil change, fuel injector and turbo cleaning, full suspension inspection."]];
+$('svcDl').onclick=()=>{
+  const q=x=>'"'+String(x).replace(/"/g,'""')+'"';
+  const out=[['Make-Wise Commercial Vehicle Service Intervals'],[],
+    ['Manufacturer (Make)','Vehicle Category / Key Models','Minor / Free Service Interval','Major Service & Engine Oil Change Interval'],
+    ...SVC_ROWS,[],['Standard maintenance milestones, any make'],...SVC_TIERS,[],
+    ['City stop-and-go, mining or dusty roads wear a truck faster. Bring these intervals forward by 15-20%.'],
+    ['A guide only. Your truck\'s service book has the exact interval.'],[],['NEXUS AI Transport']];
+  const csv='\ufeff'+out.map(r=>r.map(q).join(',')).join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='Service_intervals_by_make.csv'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+};
+
+/* ===== Loading / unloading point -> road distance =====
+   Suggestions while typing: Photon (OpenStreetMap). Typed text / PIN fallback: Nominatim + India Post.
+   Map picking: Leaflet + OpenStreetMap tiles, loaded only when the map is opened.
+   Road distance: OSRM public router. Best route: opens Google Maps (live traffic). */
+const PT={A:null,B:null};
+const NAME={A:'loading',B:'unloading'};
+async function nomi(params){
+  const u='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=in&'+new URLSearchParams(params);
+  const r=await fetch(u,{headers:{'Accept':'application/json'}}); if(!r.ok) return null;
+  const j=await r.json(); if(!j.length) return null;
+  return {lat:+j[0].lat, lon:+j[0].lon, label:j[0].display_name.split(',').slice(0,2).join(',').trim(), rough:false};
+}
+async function findPlace(q){
+  q=q.trim(); if(!q) return null;
+  if(/^\d{6}$/.test(q)){
+    const r=await nomi({postalcode:q}); if(r) return r;
+    try{
+      const j=await (await fetch('https://api.postalpincode.in/pincode/'+q)).json();
+      const po=j&&j[0]&&j[0].PostOffice&&j[0].PostOffice[0];
+      if(po){ const r2=await nomi({q:`${po.Name}, ${po.District}, ${po.State}`}) || await nomi({q:`${po.District}, ${po.State}`});
+        if(r2) return {...r2,label:`${po.Name}, ${po.District}`,rough:true}; }
+    }catch(e){}
+    return null;
+  }
+  return nomi({q});
+}
+async function placeName(lat,lon){
+  try{ const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=12&lat=${lat}&lon=${lon}`);
+    const j=await r.json(); const a=j.address||{};
+    return a.city||a.town||a.village||a.county||a.state_district||(j.display_name||'').split(',')[0]||null;
+  }catch(e){ return null; }
+}
+const routeNote=(t,err)=>{const n=$('routeNote'); n.textContent=t; n.className='fieldhint'+(err?' err':'');};
+function setPoint(k,p,text){
+  PT[k]=p; $('pt'+k).value=text; $('sug'+k).hidden=true;
+  if(PT.A&&PT.B) findDistance(); else routeNote(`Got the ${NAME[k]} point. Now choose the ${NAME[k==='A'?'B':'A']} point.`);
+}
+/* suggestions while typing */
+['A','B'].forEach(k=>{
+  let t=null, seq=0;
+  const inp=$('pt'+k), box=$('sug'+k);
+  inp.addEventListener('input',()=>{
+    PT[k]=null; clearTimeout(t); const q=inp.value.trim();
+    if(q.length<3||/^\d+$/.test(q)){ box.hidden=true; return; }
+    t=setTimeout(async()=>{
+      const my=++seq;
+      try{
+        const r=await fetch('https://photon.komoot.io/api/?limit=5&lang=en&bbox=68,6,98,37&q='+encodeURIComponent(q));
+        const j=await r.json(); if(my!==seq) return;
+        const f=(j.features||[]).filter(x=>(x.properties.countrycode||'IN')==='IN');
+        if(!f.length){ box.hidden=true; return; }
+        box.innerHTML=''; f.forEach(x=>{
+          const pr=x.properties, nm=pr.name||pr.city||'', sub=[pr.city!==nm?pr.city:'',pr.district||pr.county,pr.state].filter(Boolean).join(', ');
+          const btn=document.createElement('button'); btn.type='button';
+          btn.innerHTML=`${nm}<small>${sub}</small>`;
+          btn.onclick=()=>setPoint(k,{lat:x.geometry.coordinates[1],lon:x.geometry.coordinates[0],label:nm,rough:false},nm+(sub?', '+sub.split(', ').pop():''));
+          box.appendChild(btn);
+        });
+        box.hidden=false;
+      }catch(e){ box.hidden=true; }
+    },350);
+  });
+  inp.addEventListener('blur',()=>setTimeout(()=>{box.hidden=true;},200));
+});
+/* use my location, for either point */
+document.querySelectorAll('[data-loc]').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.loc;
+  if(!navigator.geolocation){ routeNote('Location is not available on this device. Type the place or pick it on the map.',true); return; }
+  routeNote('Finding where you are…');
+  navigator.geolocation.getCurrentPosition(async p=>{
+    const lat=p.coords.latitude, lon=p.coords.longitude, nm=await placeName(lat,lon);
+    setPoint(k,{lat,lon,label:nm||'Your location',rough:false},'📍 '+(nm||'My location'));
+  },()=>routeNote('Could not get your location. Allow location access, or pick the point on the map.',true),{enableHighAccuracy:true,timeout:15000});
+});
+/* pick on map */
+let LMAP=null, LMARK=null, PICK=null, PICKK=null;
+function loadLeaflet(){
+  if(window.L) return Promise.resolve();
+  return new Promise((ok,no)=>{
+    const c=document.createElement('link'); c.rel='stylesheet'; c.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'; document.head.appendChild(c);
+    const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'; s.onload=ok; s.onerror=no; document.head.appendChild(s);
+  });
+}
+document.querySelectorAll('[data-map]').forEach(b=>b.onclick=async()=>{
+  PICKK=b.dataset.map; PICK=null; $('mapOk').disabled=true;
+  $('mapTitle').textContent=`Tap the map to choose the ${NAME[PICKK]} point`;
+  $('mapModal').hidden=false;
+  try{ await loadLeaflet(); }catch(e){ $('mapModal').hidden=true; routeNote('Could not load the map. Check your internet, or type the place.',true); return; }
+  const other=PT[PICKK==='A'?'B':'A'], cur=PT[PICKK], c=cur||other;
+  if(!LMAP){
+    LMAP=L.map('pickMap').setView([22.5,78.9],5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(LMAP);
+    LMAP.on('click',e=>{ PICK=e.latlng; if(LMARK) LMARK.setLatLng(e.latlng); else LMARK=L.marker(e.latlng).addTo(LMAP); $('mapOk').disabled=false; });
+  }
+  setTimeout(()=>{ LMAP.invalidateSize(); if(c) LMAP.setView([c.lat,c.lon],cur?12:8); if(LMARK){LMAP.removeLayer(LMARK);LMARK=null;} },50);
+});
+$('mapCancel').onclick=()=>{$('mapModal').hidden=true;};
+$('mapOk').onclick=async()=>{
+  if(!PICK) return; $('mapModal').hidden=true;
+  const lat=PICK.lat, lon=PICK.lng, nm=await placeName(lat,lon);
+  setPoint(PICKK,{lat,lon,label:nm||'Point on map',rough:false},'🗺 '+(nm||'Point on map'));
+};
+/* road distance */
+async function findDistance(){
+  const qa=$('ptA').value, qb=$('ptB').value;
+  if(!(PT.A||qa.trim())||!(PT.B||qb.trim())){ routeNote('Choose both the loading and the unloading point.',true); return; }
+  routeNote('Working out the road distance…'); $('mapLink').hidden=true;
+  try{
+    const a=PT.A||await findPlace(qa); if(!a){ routeNote(`Could not find "${qa.trim()}". Pick it from the list, use your location, or pick it on the map.`,true); return; }
+    const b=PT.B||await findPlace(qb); if(!b){ routeNote(`Could not find "${qb.trim()}". Pick it from the list, use your location, or pick it on the map.`,true); return; }
+    const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`);
+    const j=await r.json();
+    if(!j.routes||!j.routes.length){ routeNote('No road route found between these two points.',true); return; }
+    const km=Math.round(j.routes[0].distance/1000);
+    $('lead').value=km; TOUCHED.add('lead');
+    if($('days').value==='') $('days').placeholder=estDays(km);
+    $('mapLink').href=`https://www.google.com/maps/dir/?api=1&origin=${a.lat},${a.lon}&destination=${b.lat},${b.lon}&travelmode=driving`;
+    $('mapLink').hidden=false;
+    routeNote(`${a.label} to ${b.label}: about ${km.toLocaleString('en-IN')} km by road.`+
+      (a.rough||b.rough?' A PIN was placed by its post office, so check the km.':'')+' Change it if your truck takes a different road.');
+    calc();
+  }catch(e){ routeNote('Could not reach the map service. Check your internet, or type the distance yourself.',true); }
+}
+$('findDist').onclick=findDistance;
+
+/* ===== Download this calculation as a spreadsheet (opens in Excel / Google Sheets) ===== */
+$('dlXls').onclick=()=>{
+  const q=x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"';
+  const lab=id=>{const l=document.querySelector(`label[for="${id}"]`); return l?l.childNodes[0].textContent.replace(/\s*\*\s*$/,'').trim():id;};
+  const val=id=>$(id)?$(id).value:'';
+  const t=trip(v('lead'),v('days')), a=ask(t.cost), ton=v('ton'), off=v('rate');
+  const rows=[['NEXUS AI Transport: trip calculation'],['Date',new Date().toLocaleDateString('en-IN')],[],
+    ['YOUR TRUCK'],['Truck',sel.value===''?'':sel.options[sel.selectedIndex].text],[lab('ton'),val('ton')],[lab('mil'),val('mil')],[],
+    ['YOUR COSTS'],['State (diesel)',$('state').value&&$('state').value!=='other'?$('state').value:''],
+    ...['fuel','defpc','ureaP','tyC','tyN','tyL','svcC','svcK','rep','drv','toll'].map(id=>[lab(id),val(id)]),
+    ['Toll reimbursed',$('tollback').checked?'Yes':'No'],
+    ...['oth','emi','ins','per','run'].map(id=>[lab(id),val(id)]),[],
+    ['THE LOAD'],['Loading point',val('ptA').replace(/^(📍|🗺)\s*/u,'')],['Unloading point',val('ptB').replace(/^(📍|🗺)\s*/u,'')],
+    ['Distance (km, one way)',val('lead')],['Trip time (days)',val('days')||t.days+' (estimated)'],
+    ['Coming back empty on the same route',$('rtn').checked?'Yes':'No'],['Rate offered (per tonne)',val('rate')],[],
+    ['RESULT'],['Cost of the trip',Math.round(t.cost)],['Breakeven rate (per tonne)',a],['Breakeven for the trip',Math.round(a*ton)]];
+  if(off>0){ const pl=off*ton-t.cost; rows.push(['Freight in',Math.round(off*ton)],[pl>=0?'Profit':'Loss',Math.round(Math.abs(pl))]); }
+  const csv='\ufeff'+rows.map(r=>r.map(q).join(',')).join('\r\n');
+  const el=document.createElement('a');
+  el.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  el.download='NEXUS_trip_'+new Date().toISOString().slice(0,10)+'.csv'; document.body.appendChild(el); el.click();
+  setTimeout(()=>{URL.revokeObjectURL(el.href);el.remove();},500);
+};
+$('goHome').onclick=()=>{SEG='home';TRUCKOPEN=false;paint();goTop();};
 $('tDoc2').onclick=()=>{SUB.comp='di';paint();};
 $('tEwb').onclick=()=>{SUB.comp='ewb';paint();};
 $('tDoc').onclick=()=>{SUB.comp='doc';paint();};
 $('tHelp').onclick=()=>{SUB.comp='help';paint();};
-$('tEdit').onclick=()=>{TRUCKOPEN=true;paint();goTop();};
-$('tDone').onclick=()=>{COSTSDONE=true;TRUCKOPEN=false;paint();calc();};
 if($('rtn')) $('rtn').addEventListener('change',calc);
-$('goCalc').onclick=()=>{calc();$('plate').scrollIntoView({behavior:'smooth',block:'center'});};
+$('goCalc').onclick=()=>{TRIED=true;calc();($('answer').hidden?$('cmp'):$('answer')).scrollIntoView({behavior:'smooth',block:'start'});};
 $('resetAll').onclick=()=>{
-  ['ton','mil','lead','days','rate','fuel','defpc','tyC','tyN','tyL','svcC','svcK','rep',
-   'drv','toll','tollback','emi','ins','per','oth','run'].forEach(i=>{ if($(i)) $(i).value=''; });
+  ['ton','mil','lead','days','rate','fuel','defpc','ureaP','tyC','tyN','tyL','svcC','svcK','rep',
+   'drv','toll','emi','ins','per','oth','run'].forEach(i=>{ if($(i)) $(i).value=''; });
+  $('tollback').checked=false; $('tollNo').checked=true;
+  $('defpc').value='0.025'; $('ureaP').value='80';
   if($('rtn')) $('rtn').checked=false;
-  sel.value=''; TOUCHED.clear(); COSTSDONE=false; TRUCKOPEN=false;
+  stSel.value=''; $('fuelNote').textContent='';
+  $('ptA').value=''; $('ptB').value=''; PT.A=PT.B=null; $('mapLink').hidden=true; $('routeNote').textContent='';
+ $('fuelStar').hidden=true;
+  sel.value=''; TOUCHED.clear(); COSTSDONE=false; TRIED=false; TRUCKOPEN=false;
   paint(); calc();
   window.scrollTo({top:0,behavior:'smooth'});
 };
-$('goRate').onclick=()=>{SEG='rate';paint();goTop();};
 
 sel.onchange=seed;
-['ton','mil','lead','days','rate','fuel','defpc','tyC','tyN','tyL','svcC','svcK','rep',
+['ton','mil','lead','days','rate','fuel','defpc','ureaP','tyC','tyN','tyL','svcC','svcK','rep',
  'drv','toll','tollback','emi','ins','per','oth','run']
   .forEach(i=>$(i).addEventListener('input',()=>{TOUCHED.add(i);calc();}));
-seed(); render(); drawDocs(); drawEwb(); paint();
+['tollback','tollNo'].forEach(i=>$(i).addEventListener('change',calc));
+seed(); drawDocs(); drawEwb(); paint();
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script src="/nexus-tracking.js"></script>      
