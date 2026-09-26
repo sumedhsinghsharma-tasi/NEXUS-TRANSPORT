@@ -226,6 +226,54 @@ details input{font-size:16px}
 .tollq .optline{margin:0}
 .tollql{font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--mute)}
 .warnnote{color:var(--oxide)}
+.seg button:disabled{cursor:not-allowed;opacity:.75;background:repeating-linear-gradient(135deg,var(--paper) 0 10px,var(--slip) 10px 20px)}
+.devtag{color:var(--oxide)!important;font-weight:700}
+.scene{position:relative;overflow:hidden;margin-top:26px;height:134px}
+.truck{position:absolute;left:0;top:10px;width:300px;animation:drive 11s linear infinite}
+.trk{width:100%;height:auto;display:block;animation:bob .5s ease-in-out infinite alternate}
+.trk .w{transform-origin:0 0;animation:wspin .6s linear infinite}
+@keyframes wspin{to{transform:rotate(360deg)}}
+.trk .p{transform-box:fill-box;transform-origin:center;fill:none;stroke:var(--ink);stroke-width:2;opacity:0;animation:puff 1.8s ease-out infinite}
+.trk .p2{animation-delay:.6s}.trk .p3{animation-delay:1.2s}
+@keyframes puff{0%{opacity:.9;transform:translate(0,0) scale(.6)}100%{opacity:0;transform:translate(26px,-20px) scale(2.2)}}
+@keyframes bob{to{transform:translateY(1.5px)}}
+@keyframes drive{0%{transform:translateX(-320px)}100%{transform:translateX(calc(100vw))}}
+.road{position:absolute;left:0;right:0;top:108px;height:4px;background:var(--ink)}
+.road::after{content:"";position:absolute;left:0;right:0;top:12px;height:3px;
+  background:repeating-linear-gradient(90deg,var(--ink) 0 26px,transparent 26px 50px);animation:lane .6s linear infinite}
+@keyframes lane{to{background-position:-50px 0}}
+.trktxt{font-family:'Archivo',system-ui,sans-serif;font-size:17px;font-weight:900;fill:var(--ink);letter-spacing:-.01em}
+@media (prefers-reduced-motion:reduce){.truck,.trk,.trk *,.road::after{animation:none!important}.truck{left:10%}}
+
+.ccard{border:2px solid var(--ink);margin:10px 0;background:var(--paper)}
+.ccard.done{border-color:var(--moss)} .ccard.err{border-color:var(--oxide)}
+.chead{display:grid;grid-template-columns:38px 1fr auto 18px;align-items:center;gap:10px;width:100%;
+  background:transparent;border:0;padding:11px 12px;cursor:pointer;text-align:left;font-family:inherit;color:var(--ink)}
+.cicon{width:34px;height:34px;display:grid;place-items:center}
+.ic{width:30px;height:30px;color:var(--ink);overflow:visible}
+.cname{font-size:15px;font-weight:900;line-height:1.25}
+.req{color:var(--oxide);font-weight:900}
+.cstat{font-size:12px;font-weight:700;color:var(--mute);text-align:right;max-width:150px;line-height:1.3}
+.ccard.done .cstat{color:var(--moss)} .ccard.err .cstat{color:var(--oxide)}
+.chev{font-size:13px;transition:transform .2s}
+.chead[aria-expanded=true] .chev{transform:rotate(180deg)}
+.cbody{padding:2px 12px 14px;border-top:1px solid var(--rule)}
+.cnext{margin-top:14px;text-align:right}
+.svcdlrow{margin:10px 0 2px}
+.svcdlrow .dlbtn{max-width:none}
+.reqnote{font-size:12px;color:var(--mute);margin:6px 0 0}
+.ic-fuel .drop{animation:drip 1.8s ease-in infinite}
+@keyframes drip{0%{transform:translateY(-2px);opacity:0}30%{opacity:1}100%{transform:translateY(8px);opacity:0}}
+.ic-tyre .spin{transform-origin:16px 16px;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ic-wrench .wr{transform-origin:8px 24px;animation:wig 2.2s ease-in-out infinite}
+@keyframes wig{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-14deg)}85%{transform:rotate(8deg)}}
+.ic-road .dash{animation:roll .8s linear infinite}
+@keyframes roll{to{stroke-dashoffset:-6}}
+.ic-cal .rs2{transform-origin:16px 21px;animation:beat 2s ease-in-out infinite}
+@keyframes beat{0%,70%,100%{transform:scale(1)}80%{transform:scale(1.35)}}
+@media (prefers-reduced-motion:reduce){.ic *{animation:none!important}}
+
 .freightpanel{border-top:6px solid var(--plate)}
 .route{margin:4px 0 14px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
 .route input[type=text]{width:100%;font-size:16px}
@@ -243,7 +291,9 @@ details input{font-size:16px}
 .mapmodal[hidden]{display:none}
 .mapbox{background:var(--paper);border:2px solid var(--ink);width:100%;max-width:640px;padding:12px}
 .maphead{font-size:14px;margin-bottom:8px}
-#pickMap{height:min(60vh,440px);width:100%;border:1px solid var(--ink)}
+.mapsearch{margin-bottom:8px;z-index:1001}.mapsearch input{width:100%;font-size:16px}
+.mapsearch .sugg{z-index:1002}
+#pickMap{height:min(55vh,420px);width:100%;border:1px solid var(--ink)}
 button.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
 .maplink{font-size:13px;font-weight:700;color:var(--ink);align-self:center}
 #routeNote:empty{display:none}
@@ -290,7 +340,26 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 <div class="hometitle">What do you want to do?</div>
 <div class="seg">
   <button id="sRate" aria-pressed="true"><b>Profit calculator</b><span>Is your freight making you money?</span></button>
-  <button id="sComp" aria-pressed="false"><b>Papers and deadlines</b><span>Nothing expires on you</span></button>
+  <button id="sComp" aria-pressed="false" disabled><b>Papers and deadlines</b><span class="devtag">Under development · not ready for users yet</span></button>
+</div>
+<div class="scene" aria-hidden="true">
+  <div class="truck">
+    <svg viewBox="0 0 380 130" class="trk"><g transform="translate(380 0) scale(-1 1)">
+      <g class="puffs"><circle class="p p1" cx="118" cy="22" r="6"/><circle class="p p2" cx="118" cy="22" r="6"/><circle class="p p3" cx="118" cy="22" r="6"/></g>
+      <g class="body" fill="var(--paper)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round">
+        <rect x="116" y="26" width="5" height="36"/>
+        <rect x="128" y="18" width="236" height="78"/>
+        <path d="M18 98V58l14-24h58v64z"/>
+        <path d="M36 42h26v20H26z" fill="none" stroke-width="2.4"/>
+        <path d="M90 98h38" fill="none"/>
+        <rect x="12" y="84" width="10" height="8" stroke-width="2"/>
+      </g>
+      <g transform="translate(44 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g><g transform="translate(78 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g><g transform="translate(100 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g><g transform="translate(210 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g><g transform="translate(236 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g><g transform="translate(262 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g><g transform="translate(290 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g><g transform="translate(314 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g><g transform="translate(340 112)"><g class="w"><circle r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle r="4" fill="none" stroke="var(--ink)" stroke-width="2"/><path d="M0 -11V-4M0 4v7M-11 0h7M4 0h7" stroke="var(--ink)" stroke-width="1.6"/></g></g>
+    </g>
+      <text x="134" text-anchor="middle" class="trktxt"><tspan x="134" y="52">I&rsquo;m here to</tspan><tspan x="134" y="74">make you money</tspan></text>
+    </svg>
+  </div>
+  <div class="road"></div>
 </div>
 </div>
 
@@ -308,8 +377,9 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
   <h2>Your costs</h2>
   <div class="costcall" id="tEdit" role="status" style="margin-top:10px"></div>
   <div class="costbody">
-
-    <div class="ctitle">Fuel</div>
+    <div class="ccard" data-sec="fuel">
+      <button type="button" class="chead" aria-expanded="false"><span class="cicon"><svg viewBox="0 0 32 32" class="ic ic-fuel"><rect x="5" y="6" width="14" height="22" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="9" width="8" height="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19 12h4l3 4v9a2 2 0 0 1-4 0v-5h-3" fill="none" stroke="currentColor" stroke-width="2"/><path class="drop" d="M26 4c1.4 2 2 3 2 4a2 2 0 0 1-4 0c0-1 .6-2 2-4z" fill="currentColor"/></svg></span><span class="cname">Fuel <span class="req">*</span></span><span class="cstat" id="st_fuel">Tap to fill</span><span class="chev">▾</span></button>
+      <div class="cbody" hidden>
     <div class="truckrow">
       <div><label for="state">Your state</label><select id="state"></select></div>
       <div><label for="fuel">Diesel per litre <span id="fuelStar" hidden>*</span></label><div class="rs"><input class="num" id="fuel" type="number" step="1"></div></div>
@@ -330,15 +400,26 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
       </div>
     </div>
 
-    <div class="ctitle">Tyres</div>
+      <div class="cnext"><button type="button" class="ghost" data-next="tyres">Next: Tyres ›</button></div>
+      </div>
+    </div>
+    <div class="ccard" data-sec="tyres">
+      <button type="button" class="chead" aria-expanded="false"><span class="cicon"><svg viewBox="0 0 32 32" class="ic ic-tyre"><g class="spin"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-dasharray="3.1 2"/><circle cx="16" cy="16" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 10.5V4.5M16 21.5v6M10.5 16h-6M21.5 16h6" stroke="currentColor" stroke-width="1.6"/></g></svg></span><span class="cname">Tyres <span class="req">*</span></span><span class="cstat" id="st_tyres">Tap to fill</span><span class="chev">▾</span></button>
+      <div class="cbody" hidden>
     <div class="grid">
       <div><label for="tyC">One tyre costs</label><div class="rs"><input class="num" id="tyC" type="number" step="500" placeholder="15,000–25,000"></div></div>
-      <div><label for="tyN">How many tyres <i>fills from your truck</i></label><input class="num" id="tyN" type="number" step="1"></div>
+      <div><label for="tyN">How many tyres</label><input class="num" id="tyN" type="number" step="1"></div>
       <div><label for="tyL">A tyre lasts <i>km</i></label><input class="num" id="tyL" type="number" step="5000" placeholder="70,000–80,000"></div>
     </div>
     <p class="fieldhint">If you run underload, a tyre usually lasts 70,000 to 80,000 km. Overloading wears it out sooner.</p>
 
-    <div class="ctitle ctrow"><span>Service and repairs</span><button type="button" class="dlbtn" id="svcDl">Check your truck's service schedule first ↓</button></div>
+      <div class="cnext"><button type="button" class="ghost" data-next="service">Next: Service and repairs ›</button></div>
+      </div>
+    </div>
+    <div class="ccard" data-sec="service">
+      <button type="button" class="chead" aria-expanded="false"><span class="cicon"><svg viewBox="0 0 32 32" class="ic ic-wrench"><path class="wr" d="M21 4a6 6 0 0 0-5.6 8.2L5 22.6a2.3 2.3 0 0 0 3.3 3.3l10.4-10.4A6 6 0 0 0 27 10l-3.6 3.6-3.4-1-1-3.4L22.6 5.6A6 6 0 0 0 21 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><span class="cname">Service and repairs <span class="req">*</span></span><span class="cstat" id="st_service">Tap to fill</span><span class="chev">▾</span></button>
+      <div class="cbody" hidden>
+    <div class="svcdlrow"><button type="button" class="dlbtn" id="svcDl">Check your truck's service schedule first ↓</button></div>
     <div class="grid gtop">
       <div><label for="svcC">One service costs</label><div class="rs"><input class="num" id="svcC" type="number" step="500" placeholder="40,000–50,000"></div>
         <p class="fieldhint">This includes replacing your clutch plate.</p></div>
@@ -348,7 +429,12 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
         <p class="fieldhint">Anything which can be repaired by a quick stop at a workshop within a day or two.</p></div>
     </div>
 
-    <div class="ctitle">Every trip</div>
+      <div class="cnext"><button type="button" class="ghost" data-next="trip">Next: Every trip ›</button></div>
+      </div>
+    </div>
+    <div class="ccard" data-sec="trip">
+      <button type="button" class="chead" aria-expanded="false"><span class="cicon"><svg viewBox="0 0 32 32" class="ic ic-road"><path d="M9 28L13 4M23 28L19 4" stroke="currentColor" stroke-width="2"/><path class="dash" d="M16 4v24" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg></span><span class="cname">Every trip <span class="req">*</span></span><span class="cstat" id="st_trip">Tap to fill</span><span class="chev">▾</span></button>
+      <div class="cbody" hidden>
     <div class="grid">
       <div><label for="drv">Driver and advance</label><div class="rs"><input class="num" id="drv" type="number" step="100"></div></div>
     </div>
@@ -372,7 +458,12 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
       </div>
     </div>
 
-    <div class="ctitle">Paid whether the truck moves or not</div>
+      <div class="cnext"><button type="button" class="ghost" data-next="fixed">Next: Paid whether the truck moves or not ›</button></div>
+      </div>
+    </div>
+    <div class="ccard" data-sec="fixed">
+      <button type="button" class="chead" aria-expanded="false"><span class="cicon"><svg viewBox="0 0 32 32" class="ic ic-cal"><rect x="4" y="7" width="24" height="21" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 13h24M10 4v6M22 4v6" stroke="currentColor" stroke-width="2"/><text class="rs2" x="16" y="25" text-anchor="middle" font-size="10" font-weight="900" fill="currentColor">₹</text></svg></span><span class="cname">Paid whether the truck moves or not <span class="req">*</span></span><span class="cstat" id="st_fixed">Tap to fill</span><span class="chev">▾</span></button>
+      <div class="cbody" hidden>
     <div class="grid">
       <div><label for="emi">EMI in a month</label><div class="rs"><input class="num" id="emi" type="number" step="1000"></div></div>
       <div><label for="ins">Insurance in a year</label><div class="rs"><input class="num" id="ins" type="number" step="1000"></div></div>
@@ -391,6 +482,10 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
         <span class="defnote warnnote">⚠ Put 25, not 30. Your truck runs 25 days a month. Festivals, holidays, monsoon and hill or border closures take the rest.</span>
       </div>
     </div>
+      <div class="cnext"><button type="button" class="ghost" data-close="fixed">Done ✓</button></div>
+      </div>
+    </div>
+    <p class="reqnote"><span class="req">*</span> Every box must be completed for your rate.</p>
   </div>
   <div class="derived num" id="derived"></div>
 </div>
@@ -595,6 +690,8 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 <div class="mapmodal" id="mapModal" hidden>
   <div class="mapbox">
     <div class="maphead"><b id="mapTitle">Tap the map to choose the point</b></div>
+    <div class="ptin mapsearch"><input id="mapQ" type="text" autocomplete="off" placeholder="Type a town or place to find it on the map">
+      <div class="sugg" id="mapSug" hidden></div></div>
     <div id="pickMap"></div>
     <div class="btnrow" style="margin:10px 0 0"><button type="button" id="mapOk" disabled>Use this point</button><button type="button" class="ghost" id="mapCancel">Cancel</button></div>
   </div>
@@ -709,7 +806,9 @@ const NEED={ton:'Tonnes',mil:'Average',fuel:'Diesel per litre',tyC:'One tyre cos
   svcC:'One service costs',svcK:'Service every',drv:'Driver and advance',emi:'EMI in a month',ins:'Insurance in a year',
   per:'Permit, tax, fitness',run:'Days you run in a month',ureaP:'Urea price per litre'};
 const missing=()=>{const m=Object.keys(NEED).filter(id=>id!=='ureaP'&&$(id).value==='');
-  if(v('defpc')>0&&$('ureaP').value==='') m.push('ureaP'); return m;};
+  if(v('defpc')>0&&$('ureaP').value==='') m.push('ureaP');
+  ['fuel','tyC','tyN','tyL','svcC','svcK','drv','emi','ins','per','run'].forEach(id=>{ if(!m.includes(id)&&badValue(id)) m.push(id); });
+  return m;};
 function markMissing(list){ Object.keys(NEED).concat(['lead']).forEach(id=>$(id).classList.toggle('miss',TRIED&&list.includes(id))); }
 const ASKCOST=`<b>These three are not the whole cost.</b><span>Most trucks lose money on costs the owner never adds up &mdash; a tyre, a service, the days the truck stands at a gate. Put in what you actually pay, once, and you will know the lowest rate you can take before you say yes. Not sure of a number? Each box shows the usual range to guide you.</span>`;
 const OWNCOST=`<b>Running on your own numbers.</b><span>Anything changed &mdash; a diesel move, a new tyre price, an EMI that shifts? Change it below and the rate follows.</span>`;
@@ -769,7 +868,7 @@ function calcOne(){
   showDerived();
 }
 
-function calc(){ calcOne(); if(document.getElementById('tSum')) truckSummary(); }
+function calc(){ calcOne(); updCards(); if(document.getElementById('tSum')) truckSummary(); }
 
 /* ---------- papers ---------- */
 let VEH=[];
@@ -1102,20 +1201,27 @@ $('sRate').onclick=()=>{SEG='rate';paint();goTop();};
 $('sComp').onclick=()=>{SEG='comp';TRUCKOPEN=false;paint();goTop();};
 
 /* ===== Service intervals list: downloads as a spreadsheet (opens in Excel / Google Sheets) ===== */
-const SVC_ROWS=[["Tata Motors", "LCVs & Small CVs (e.g., Tata Ace, Zip, Magic)", "Every 10,000 km or 4 months", "Every 10,000 to 20,000 km"], ["Tata Motors", "M&HCVs / Heavy Trucks (e.g., Prima, Signa)", "Every 20,000 km (Greasing & general inspection)", "Every 40,000 to 80,000 km (depends on the engine tech)"], ["Ashok Leyland", "LCVs (e.g., Dost, BADA DOST, Partner)", "Every 5,000 km or 3 months", "Every 10,000 to 20,000 km"], ["Ashok Leyland", "M&HCVs / Heavy Trucks (e.g., AVTR, BOSS 1115HB)", "Every 20,000 to 30,000 km", "Up to 80,000 km (Extended drain for high-efficiency models)"], ["Mahindra & Mahindra", "Small CVs & Pickups (e.g., Bolero Maxx, Supro, Jeeto)", "Every 10,000 km", "Every 20,000 km (under severe conditions, reduce to 5,000 km)"], ["Mahindra & Mahindra", "Heavy Commercial Trucks (e.g., Blazo X, Furio)", "Every 30,000 km (First check at 10,000 km)", "Up to 80,000 to 120,000 km for high-grade synthetic gear/hub oils"], ["Eicher Trucks & Buses", "ICVs & Light Trucks (e.g., Pro 2000 & 3000 series)", "Every 10,000 to 15,000 km", "Every 30,000 to 40,000 km"], ["Eicher Trucks & Buses", "Heavy Duty Trucks (e.g., Pro 6000 & 8000 series)", "Every 20,000 to 40,000 km", "Every 50,000 to 60,000 km (Filter replacements match this cycle)"], ["BharatBenz", "Heavy Duty Tippers & Tractors", "Every 25,000 km", "Every 50,000 to 100,000 km (Depends on long-haul vs mining usage)"], ["Maruti Suzuki Commercial", "Mini Trucks (e.g., Super Carry)", "Every 5,000 km", "Every 10,000 km"]];
+/* ===== Excel downloads: the xlsx library loads only when someone presses a download button ===== */
+function loadXLSX(){
+  if(window.XLSX) return Promise.resolve();
+  return new Promise((ok,no)=>{const sc=document.createElement('script');
+    sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; sc.onload=ok; sc.onerror=no; document.head.appendChild(sc);});
+}
+async function saveXLSX(rows,name,sheet,cols){
+  try{ await loadXLSX(); }catch(e){ alert('Could not prepare the Excel file. Check your internet and try again.'); return; }
+  const ws=XLSX.utils.aoa_to_sheet(rows); if(cols) ws['!cols']=cols.map(w=>({wch:w}));
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,sheet); XLSX.writeFile(wb,name);
+}
+/* Service intervals: makes across the top, vehicle class down the side */
+const SVC_GRID=[["Vehicle class", "", "Tata Motors", "Ashok Leyland", "Mahindra & Mahindra", "Eicher Trucks & Buses", "BharatBenz", "Maruti Suzuki Commercial"], ["LCV (4 and 6 tyre)", "Minor service", "Every 10,000 km or 4 months", "Every 5,000 km or 3 months", "Every 10,000 km", "Every 10,000 to 15,000 km", "—", "Every 5,000 km"], ["", "Major service and oil change", "Every 10,000 to 20,000 km", "Every 10,000 to 20,000 km", "Every 20,000 km (under severe conditions, reduce to 5,000 km)", "Every 30,000 to 40,000 km", "—", "Every 10,000 km"], ["", "Models", "Ace, Zip, Magic", "Dost, Bada Dost, Partner", "Bolero Maxx, Supro, Jeeto", "Pro 2000 and 3000 series", "—", "Super Carry"], [], ["MCV (10 and 12 tyre)", "Minor service", "Every 20,000 km (greasing and general inspection)", "Every 20,000 to 30,000 km", "Every 30,000 km (first check at 10,000 km)", "Every 10,000 to 15,000 km", "—", "—"], ["", "Major service and oil change", "Every 40,000 to 80,000 km (depends on the engine tech)", "Up to 80,000 km (extended drain for high-efficiency models)", "Up to 80,000 to 1,20,000 km for high-grade synthetic gear/hub oils", "Every 30,000 to 40,000 km", "—", "—"], ["", "Models", "Prima, Signa (M&HCV)", "AVTR, BOSS 1115HB (M&HCV)", "Blazo X, Furio", "Pro 2000 and 3000 series", "—", "—"], [], ["HCV (14, 16, 18, 22 tyre and above)", "Minor service", "Every 20,000 km (greasing and general inspection)", "Every 20,000 to 30,000 km", "Every 30,000 km (first check at 10,000 km)", "Every 20,000 to 40,000 km", "Every 25,000 km", "—"], ["", "Major service and oil change", "Every 40,000 to 80,000 km (depends on the engine tech)", "Up to 80,000 km (extended drain for high-efficiency models)", "Up to 80,000 to 1,20,000 km for high-grade synthetic gear/hub oils", "Every 50,000 to 60,000 km (filter replacements match this cycle)", "Every 50,000 to 1,00,000 km (depends on long-haul vs mining usage)", "—"], ["", "Models", "Prima, Signa (M&HCV)", "AVTR, BOSS 1115HB (M&HCV)", "Blazo X, Furio", "Pro 6000 and 8000 series", "Heavy duty tippers and tractors", "—"], []];
 const SVC_TIERS=[["Every 5,000–10,000 km: basic check and greasing", "Chassis greasing, air filter cleaning, tyre rotation, brake pad and lining checks."], ["Every 20,000–40,000 km: intermediate service", "Engine oil and oil filter change, fuel filter replacement, clutch adjustment."], ["Every 50,000–1,00,000 km: major overhaul", "Gearbox and differential oil change, fuel injector and turbo cleaning, full suspension inspection."]];
 $('svcDl').onclick=()=>{
-  const q=x=>'"'+String(x).replace(/"/g,'""')+'"';
-  const out=[['Make-Wise Commercial Vehicle Service Intervals'],[],
-    ['Manufacturer (Make)','Vehicle Category / Key Models','Minor / Free Service Interval','Major Service & Engine Oil Change Interval'],
-    ...SVC_ROWS,[],['Standard maintenance milestones, any make'],...SVC_TIERS,[],
+  const rows=[['Make-Wise Commercial Vehicle Service Intervals'],[],...SVC_GRID,[],
+    ['LCV = 4 and 6 tyre · MCV = 10 and 12 tyre · HCV = 14, 16, 18, 22 tyre and above. M&HCV = the maker gives one figure for medium and heavy trucks.'],[],
+    ['Standard maintenance milestones, any make'],...SVC_TIERS,[],
     ['City stop-and-go, mining or dusty roads wear a truck faster. Bring these intervals forward by 15-20%.'],
     ['A guide only. Your truck\'s service book has the exact interval.'],[],['NEXUS AI Transport']];
-  const csv='\ufeff'+out.map(r=>r.map(q).join(',')).join('\r\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='Service_intervals_by_make.csv'; document.body.appendChild(a); a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  saveXLSX(rows,'Service_intervals_by_make.xlsx','Service intervals',[34,28,40,40,40,40,40,34]);
 };
 
 /* ===== Loading / unloading point -> road distance =====
@@ -1202,18 +1308,36 @@ function loadLeaflet(){
   });
 }
 document.querySelectorAll('[data-map]').forEach(b=>b.onclick=async()=>{
-  PICKK=b.dataset.map; PICK=null; $('mapOk').disabled=true;
-  $('mapTitle').textContent=`Tap the map to choose the ${NAME[PICKK]} point`;
+  PICKK=b.dataset.map; PICK=null; $('mapOk').disabled=true; $('mapQ').value=''; $('mapSug').hidden=true;
+  $('mapTitle').textContent=`Find the ${NAME[PICKK]} point: type it, or tap the map`;
   $('mapModal').hidden=false;
   try{ await loadLeaflet(); }catch(e){ $('mapModal').hidden=true; routeNote('Could not load the map. Check your internet, or type the place.',true); return; }
   const other=PT[PICKK==='A'?'B':'A'], cur=PT[PICKK], c=cur||other;
   if(!LMAP){
     LMAP=L.map('pickMap').setView([22.5,78.9],5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(LMAP);
-    LMAP.on('click',e=>{ PICK=e.latlng; if(LMARK) LMARK.setLatLng(e.latlng); else LMARK=L.marker(e.latlng).addTo(LMAP); $('mapOk').disabled=false; });
+    LMAP.on('click',e=>placeMarker(e.latlng));
   }
   setTimeout(()=>{ LMAP.invalidateSize(); if(c) LMAP.setView([c.lat,c.lon],cur?12:8); if(LMARK){LMAP.removeLayer(LMARK);LMARK=null;} },50);
 });
+function placeMarker(ll,zoom){ PICK=ll; if(LMARK) LMARK.setLatLng(ll); else LMARK=L.marker(ll).addTo(LMAP);
+  if(zoom) LMAP.setView(ll,zoom); $('mapOk').disabled=false; }
+(()=>{ let t=null, seq=0; const inp=$('mapQ'), box=$('mapSug');
+  inp.addEventListener('input',()=>{ clearTimeout(t); const q=inp.value.trim();
+    if(q.length<3){ box.hidden=true; return; }
+    t=setTimeout(async()=>{ const my=++seq;
+      try{ const r=await fetch('https://photon.komoot.io/api/?limit=5&lang=en&bbox=68,6,98,37&q='+encodeURIComponent(q));
+        const j=await r.json(); if(my!==seq) return;
+        const f=(j.features||[]).filter(x=>(x.properties.countrycode||'IN')==='IN');
+        if(!f.length){ box.hidden=true; return; }
+        box.innerHTML=''; f.forEach(x=>{ const pr=x.properties, nm=pr.name||pr.city||'',
+          sub=[pr.city!==nm?pr.city:'',pr.district||pr.county,pr.state].filter(Boolean).join(', ');
+          const btn=document.createElement('button'); btn.type='button'; btn.innerHTML=`${nm}<small>${sub}</small>`;
+          btn.onclick=()=>{ box.hidden=true; inp.value=nm; if(LMAP) placeMarker({lat:x.geometry.coordinates[1],lng:x.geometry.coordinates[0]},13); };
+          box.appendChild(btn); });
+        box.hidden=false;
+      }catch(e){ box.hidden=true; } },350); });
+})();
 $('mapCancel').onclick=()=>{$('mapModal').hidden=true;};
 $('mapOk').onclick=async()=>{
   if(!PICK) return; $('mapModal').hidden=true;
@@ -1245,9 +1369,8 @@ $('findDist').onclick=findDistance;
 
 /* ===== Download this calculation as a spreadsheet (opens in Excel / Google Sheets) ===== */
 $('dlXls').onclick=()=>{
-  const q=x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"';
   const lab=id=>{const l=document.querySelector(`label[for="${id}"]`); return l?l.childNodes[0].textContent.replace(/\s*\*\s*$/,'').trim():id;};
-  const val=id=>$(id)?$(id).value:'';
+  const val=id=>{const x=$(id)?$(id).value:''; return x!==''&&!isNaN(+x)?+x:x;};
   const t=trip(v('lead'),v('days')), a=ask(t.cost), ton=v('ton'), off=v('rate');
   const rows=[['NEXUS AI Transport: trip calculation'],['Date',new Date().toLocaleDateString('en-IN')],[],
     ['YOUR TRUCK'],['Truck',sel.value===''?'':sel.options[sel.selectedIndex].text],[lab('ton'),val('ton')],[lab('mil'),val('mil')],[],
@@ -1255,24 +1378,48 @@ $('dlXls').onclick=()=>{
     ...['fuel','defpc','ureaP','tyC','tyN','tyL','svcC','svcK','rep','drv','toll'].map(id=>[lab(id),val(id)]),
     ['Toll reimbursed',$('tollback').checked?'Yes':'No'],
     ...['oth','emi','ins','per','run'].map(id=>[lab(id),val(id)]),[],
-    ['THE LOAD'],['Loading point',val('ptA').replace(/^(📍|🗺)\s*/u,'')],['Unloading point',val('ptB').replace(/^(📍|🗺)\s*/u,'')],
+    ['THE LOAD'],['Loading point',String(val('ptA')).replace(/^(📍|🗺)\s*/u,'')],['Unloading point',String(val('ptB')).replace(/^(📍|🗺)\s*/u,'')],
     ['Distance (km, one way)',val('lead')],['Trip time (days)',val('days')||t.days+' (estimated)'],
     ['Coming back empty on the same route',$('rtn').checked?'Yes':'No'],['Rate offered (per tonne)',val('rate')],[],
     ['RESULT'],['Cost of the trip',Math.round(t.cost)],['Breakeven rate (per tonne)',a],['Breakeven for the trip',Math.round(a*ton)]];
   if(off>0){ const pl=off*ton-t.cost; rows.push(['Freight in',Math.round(off*ton)],[pl>=0?'Profit':'Loss',Math.round(Math.abs(pl))]); }
-  const csv='\ufeff'+rows.map(r=>r.map(q).join(',')).join('\r\n');
-  const el=document.createElement('a');
-  el.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  el.download='NEXUS_trip_'+new Date().toISOString().slice(0,10)+'.csv'; document.body.appendChild(el); el.click();
-  setTimeout(()=>{URL.revokeObjectURL(el.href);el.remove();},500);
+  saveXLSX(rows,'NEXUS_trip_'+new Date().toISOString().slice(0,10)+'.xlsx','Trip',[40,26]);
 };
+
+/* ===== Cost cards: open one at a time, show Completed / missing / error ===== */
+const SECS={fuel:['fuel'],tyres:['tyC','tyN','tyL'],service:['svcC','svcK'],trip:['drv'],fixed:['emi','ins','per','run']};
+const CHECK={run:x=>(x>=1&&x<=31)||'Days in a month must be 1 to 31',tyN:x=>(x>=1&&x<=40)||'Tyres must be 1 to 40'};
+function badValue(id){ const el=$(id); if(!el||el.value==='') return null; const x=+el.value;
+  if(CHECK[id]){ const r=CHECK[id](x); if(r!==true) return r; } if(!(x>0)) return (NEED[id]||id)+' must be more than 0'; return null; }
+function secNeed(k){ const ids=[...SECS[k]]; if(k==='fuel'&&v('defpc')>0) ids.push('ureaP'); return ids; }
+function updCards(){
+  Object.keys(SECS).forEach(k=>{
+    const ids=secNeed(k), card=document.querySelector(`.ccard[data-sec="${k}"]`), st=$('st_'+k);
+    const empty=ids.filter(id=>$(id).value===''), errs=ids.concat(k==='service'?['rep']:[]).map(badValue).filter(Boolean);
+    card.classList.remove('done','err');
+    if(errs.length){ card.classList.add('err'); st.textContent='Check: '+errs[0]; }
+    else if(!empty.length){ card.classList.add('done'); st.textContent='Completed ✓'; }
+    else if(TRIED){ card.classList.add('err'); st.textContent='Missing: '+empty.map(id=>NEED[id]).join(', '); }
+    else st.textContent = empty.length===ids.length ? 'Tap to fill' : `${ids.length-empty.length} of ${ids.length} filled`;
+  });
+}
+function openCard(k,scroll){
+  document.querySelectorAll('.ccard').forEach(c=>{ const on=c.dataset.sec===k && c.querySelector('.cbody').hidden;
+    c.querySelector('.cbody').hidden=!on; c.querySelector('.chead').setAttribute('aria-expanded',on); });
+  if(scroll){ const c=document.querySelector(`.ccard[data-sec="${k}"]`); if(c) c.scrollIntoView({behavior:'smooth',block:'start'}); }
+}
+document.querySelectorAll('.ccard .chead').forEach(h=>h.onclick=()=>openCard(h.parentNode.dataset.sec,false));
+document.querySelectorAll('[data-next]').forEach(b=>b.onclick=()=>openCard(b.dataset.next,true));
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{ openCard('__none__'); document.querySelector('.ccard[data-sec="fixed"]').scrollIntoView({behavior:'smooth',block:'center'}); });
 $('goHome').onclick=()=>{SEG='home';TRUCKOPEN=false;paint();goTop();};
 $('tDoc2').onclick=()=>{SUB.comp='di';paint();};
 $('tEwb').onclick=()=>{SUB.comp='ewb';paint();};
 $('tDoc').onclick=()=>{SUB.comp='doc';paint();};
 $('tHelp').onclick=()=>{SUB.comp='help';paint();};
 if($('rtn')) $('rtn').addEventListener('change',calc);
-$('goCalc').onclick=()=>{TRIED=true;calc();($('answer').hidden?$('cmp'):$('answer')).scrollIntoView({behavior:'smooth',block:'start'});};
+$('goCalc').onclick=()=>{TRIED=true;calc();
+  { const bad=Object.keys(SECS).find(k=>document.querySelector(`.ccard[data-sec="${k}"]`).classList.contains('err')); if(bad && document.querySelector(`.ccard[data-sec="${bad}"] .cbody`).hidden) openCard(bad,false); }
+ ($('answer').hidden?$('cmp'):$('answer')).scrollIntoView({behavior:'smooth',block:'start'});};
 $('resetAll').onclick=()=>{
   ['ton','mil','lead','days','rate','fuel','defpc','ureaP','tyC','tyN','tyL','svcC','svcK','rep',
    'drv','toll','emi','ins','per','oth','run'].forEach(i=>{ if($(i)) $(i).value=''; });
@@ -1283,7 +1430,7 @@ $('resetAll').onclick=()=>{
   $('ptA').value=''; $('ptB').value=''; PT.A=PT.B=null; $('mapLink').hidden=true; $('routeNote').textContent='';
  $('fuelStar').hidden=true;
   sel.value=''; TOUCHED.clear(); COSTSDONE=false; TRIED=false; TRUCKOPEN=false;
-  paint(); calc();
+  openCard('__none__'); paint(); calc();
   window.scrollTo({top:0,behavior:'smooth'});
 };
 
