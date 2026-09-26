@@ -226,6 +226,9 @@ details input{font-size:16px}
 .tollq .optline{margin:0}
 .tollql{font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--mute)}
 .warnnote{color:var(--oxide)}
+.gmhint a{color:var(--ink);font-weight:700}
+#vno{width:100%;font-size:16px;text-transform:uppercase}#load{width:100%}
+.rtnnote{font-weight:700;color:var(--ink)}.rtnnote:empty{display:none}
 .seg button:disabled{cursor:not-allowed;opacity:.75;background:repeating-linear-gradient(135deg,var(--paper) 0 10px,var(--slip) 10px 20px)}
 .devtag{color:var(--oxide)!important;font-weight:700}
 .scene{position:relative;overflow:hidden;margin-top:26px;height:134px}
@@ -364,6 +367,12 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 </div>
 
 <div id="segRate">
+  <div class="panel" style="margin-bottom:12px">
+  <div class="grid gtop">
+    <div><label for="vno">Vehicle number <i>optional</i></label><input id="vno" type="text" autocomplete="off" autocapitalize="characters" maxlength="13" placeholder="e.g. MP09 HH 1234"></div>
+    <div><label for="load">What are you carrying?</label><select id="load"><option value="">Choose load</option><option>Cement</option><option>Clinker</option><option>Fly ash</option><option>Coal</option><option>Gypsum</option><option>Limestone</option><option>Wheat</option><option>Rice</option><option>Other grains and pulses</option><option>Sugar</option><option>Fertiliser</option><option>Steel and iron</option><option>Sand and aggregates</option><option>Timber</option><option>FMCG and parcels</option><option>Other</option></select></div>
+  </div>
+  </div>
   <div class="panel" style="margin-bottom:12px">
   <h2>Your truck</h2>
   <p class="sub">Average matters most — every vehicle runs differently.</p>
@@ -524,6 +533,7 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
         <button type="button" class="locbtn" data-map="B">🗺 Pick on map</button>
       </div>
     </div>
+    <p class="fieldhint gmhint">Can&rsquo;t find it? Open <a href="https://www.google.com/maps" target="_blank" rel="noopener">Google Maps</a>, press and hold the exact spot (right-click on a computer), copy the numbers it shows, like <b>22.6042, 75.3025</b>, and paste them in the box.</p>
     <div class="btnrow" style="margin:12px 0 0">
       <button type="button" id="findDist">Find distance</button>
       <a class="maplink" id="mapLink" href="#" target="_blank" rel="noopener" hidden>See best route on Google Maps ↗</a>
@@ -532,11 +542,12 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
   </div>
   <div class="truckrow">
     <div><label for="lead">Distance <i>A to B</i></label><input class="num" id="lead" type="number" step="10"></div>
-    <div><label for="days">Trip time <i>days</i></label><input class="num" id="days" type="number" step="0.5" min="0.5"></div>
+    <div><label for="days">Trip time <i>days, one way</i></label><input class="num" id="days" type="number" step="0.5" min="0.5"></div>
     <div><label for="rate">Rate offered <i>per tonne</i></label><div class="rs"><input class="num" id="rate" type="number" step="10" placeholder="—"></div></div>
   </div>
   <p class="fieldhint">Trip time: your truck should hold 50 km an hour. With loading and unloading waits, 500 km takes 2 days to reach. Leave it blank and we work it out this way.</p>
   <label class="optline"><input type="checkbox" id="rtn"> Coming back empty on the same route — count the return trip too</label>
+  <p class="fieldhint rtnnote" id="rtnNote"></p>
   <div class="btnrow" style="margin:15px 0 0"><button type="button" id="goCalc">Let&rsquo;s calculate</button></div>
   <div class="cmp" id="cmp"></div>
   <div class="answer" id="answer" hidden>
@@ -690,7 +701,7 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
 <div class="mapmodal" id="mapModal" hidden>
   <div class="mapbox">
     <div class="maphead"><b id="mapTitle">Tap the map to choose the point</b></div>
-    <div class="ptin mapsearch"><input id="mapQ" type="text" autocomplete="off" placeholder="Type a town or place to find it on the map">
+    <div class="ptin mapsearch"><input id="mapQ" type="text" autocomplete="off" placeholder="Type a place, or paste numbers from Google Maps">
       <div class="sugg" id="mapSug" hidden></div></div>
     <div id="pickMap"></div>
     <div class="btnrow" style="margin:10px 0 0"><button type="button" id="mapOk" disabled>Use this point</button><button type="button" class="ghost" id="mapCancel">Cancel</button></div>
@@ -779,9 +790,8 @@ function seed(){
   setIf('tyN',c.tyN);
   calc();
 }
-function estDays(lead){ const s=250; /* 50 km/h with waiting: 500 km = 2 days. Used only when trip time is left blank */
-  const d=($('rtn')&&$('rtn').checked)?lead*2:lead;
-  return Math.max(0.5, Math.ceil((d/s)*2)/2); }
+function estDays(lead){ const s=250; /* ONE WAY. 50 km/h with waiting: 500 km = 2 days. Used only when trip time is left blank */
+  return Math.max(0.5, Math.ceil((lead/s)*2)/2); }
 function rates(){
   const fuelKm = v('mil')>0 ? v('fuel')/v('mil') : 0;
   const defKm  = v('defpc')*v('ureaP');  /* urea litres per km x price per litre */
@@ -795,8 +805,8 @@ function rates(){
           runKm: fuelKm+defKm+tyreKm+svcKm+tollKm};
 }
 function trip(lead,daysIn){
-  const km=($('rtn')&&$('rtn').checked)?lead*2:lead, R=rates();
-  const days=Math.max(0.5, daysIn||estDays(lead));
+  const back=$('rtn')&&$('rtn').checked, km=back?lead*2:lead, R=rates();
+  const oneWay=Math.max(0.5, daysIn||estDays(lead)), days=back?oneWay*2:oneWay;  /* empty return doubles the time as well as the km */
   const fuel=R.fuelKm*km, perKm=(R.runKm-R.fuelKm)*km;
   const cost=fuel+perKm+v('drv')+v('oth')+days*R.fixDay;
   return {km,days,fuel,perKm,cost,R};
@@ -868,7 +878,13 @@ function calcOne(){
   showDerived();
 }
 
-function calc(){ calcOne(); updCards(); if(document.getElementById('tSum')) truckSummary(); }
+function tripNote(){
+  const L=v('lead'); $('days').placeholder = L>0 ? estDays(L) : '';
+  if($('rtn').checked && L>0){ const one=v('days')||estDays(L);
+    $('rtnNote').textContent=`Empty return counted: ${(L*2).toLocaleString('en-IN')} km and ${one*2} days in total (${one} out + ${one} back).`; }
+  else $('rtnNote').textContent='';
+}
+function calc(){ calcOne(); updCards(); tripNote(); if(document.getElementById('tSum')) truckSummary(); }
 
 /* ---------- papers ---------- */
 let VEH=[];
@@ -1236,7 +1252,19 @@ async function nomi(params){
   const j=await r.json(); if(!j.length) return null;
   return {lat:+j[0].lat, lon:+j[0].lon, label:j[0].display_name.split(',').slice(0,2).join(',').trim(), rough:false};
 }
+/* Coordinates copied from Google Maps ("22.6042, 75.3025") or a long Google Maps link (@lat,lng / q=lat,lng / !3dlat!4dlng) */
+function coordsFrom(q){
+  const t=String(q||'').trim(); let m;
+  if((m=t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/))||(m=t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/))||
+     (m=t.match(/[?&](?:q|query|ll|destination|origin)=(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/i))||
+     (m=t.match(/^\(?\s*(-?\d{1,2}\.\d+)\s*[, ]\s*(-?\d{1,3}\.\d+)\s*\)?$/))){
+    const lat=+m[1], lon=+m[2];
+    if(lat>=6&&lat<=37.5&&lon>=68&&lon<=98) return {lat,lon};
+  }
+  return null;
+}
 async function findPlace(q){
+  { const c=coordsFrom(q); if(c) return {...c,label:(await placeName(c.lat,c.lon))||'Point from Google Maps',rough:false}; }
   q=q.trim(); if(!q) return null;
   if(/^\d{6}$/.test(q)){
     const r=await nomi({postalcode:q}); if(r) return r;
@@ -1267,11 +1295,15 @@ function setPoint(k,p,text){
   const inp=$('pt'+k), box=$('sug'+k);
   inp.addEventListener('input',()=>{
     PT[k]=null; clearTimeout(t); const q=inp.value.trim();
+    { const c=coordsFrom(q); if(c){ box.hidden=true; routeNote('Reading the point from Google Maps…');
+        placeName(c.lat,c.lon).then(nm=>setPoint(k,{lat:c.lat,lon:c.lon,label:nm||'Point from Google Maps',rough:false},'📌 '+(nm||'Point from Google Maps')));
+        return; } }
     if(q.length<3||/^\d+$/.test(q)){ box.hidden=true; return; }
     t=setTimeout(async()=>{
       const my=++seq;
       try{
-        const r=await fetch('https://photon.komoot.io/api/?limit=5&lang=en&bbox=68,6,98,37&q='+encodeURIComponent(q));
+        const o=PT[k==='A'?'B':'A']||PT[k], bias=o?`&lat=${o.lat}&lon=${o.lon}&location_bias_scale=0.3`:'';
+        const r=await fetch('https://photon.komoot.io/api/?limit=6&lang=en&bbox=68,6,98,37'+bias+'&q='+encodeURIComponent(q));
         const j=await r.json(); if(my!==seq) return;
         const f=(j.features||[]).filter(x=>(x.properties.countrycode||'IN')==='IN');
         if(!f.length){ box.hidden=true; return; }
@@ -1324,9 +1356,11 @@ function placeMarker(ll,zoom){ PICK=ll; if(LMARK) LMARK.setLatLng(ll); else LMAR
   if(zoom) LMAP.setView(ll,zoom); $('mapOk').disabled=false; }
 (()=>{ let t=null, seq=0; const inp=$('mapQ'), box=$('mapSug');
   inp.addEventListener('input',()=>{ clearTimeout(t); const q=inp.value.trim();
+    { const c=coordsFrom(q); if(c&&LMAP){ box.hidden=true; placeMarker({lat:c.lat,lng:c.lon},15); return; } }
     if(q.length<3){ box.hidden=true; return; }
     t=setTimeout(async()=>{ const my=++seq;
-      try{ const r=await fetch('https://photon.komoot.io/api/?limit=5&lang=en&bbox=68,6,98,37&q='+encodeURIComponent(q));
+      try{ const c=LMAP?LMAP.getCenter():null, z=LMAP?LMAP.getZoom():5, bias=c&&z>=7?`&lat=${c.lat}&lon=${c.lng}&zoom=${z}&location_bias_scale=0.3`:'';
+        const r=await fetch('https://photon.komoot.io/api/?limit=6&lang=en&bbox=68,6,98,37'+bias+'&q='+encodeURIComponent(q));
         const j=await r.json(); if(my!==seq) return;
         const f=(j.features||[]).filter(x=>(x.properties.countrycode||'IN')==='IN');
         if(!f.length){ box.hidden=true; return; }
@@ -1373,12 +1407,12 @@ $('dlXls').onclick=()=>{
   const val=id=>{const x=$(id)?$(id).value:''; return x!==''&&!isNaN(+x)?+x:x;};
   const t=trip(v('lead'),v('days')), a=ask(t.cost), ton=v('ton'), off=v('rate');
   const rows=[['NEXUS AI Transport: trip calculation'],['Date',new Date().toLocaleDateString('en-IN')],[],
-    ['YOUR TRUCK'],['Truck',sel.value===''?'':sel.options[sel.selectedIndex].text],[lab('ton'),val('ton')],[lab('mil'),val('mil')],[],
+    ['YOUR TRUCK'],['Vehicle number',String(val('vno')).toUpperCase()],['Load',$('load').value],['Truck',sel.value===''?'':sel.options[sel.selectedIndex].text],[lab('ton'),val('ton')],[lab('mil'),val('mil')],[],
     ['YOUR COSTS'],['State (diesel)',$('state').value&&$('state').value!=='other'?$('state').value:''],
     ...['fuel','defpc','ureaP','tyC','tyN','tyL','svcC','svcK','rep','drv','toll'].map(id=>[lab(id),val(id)]),
     ['Toll reimbursed',$('tollback').checked?'Yes':'No'],
     ...['oth','emi','ins','per','run'].map(id=>[lab(id),val(id)]),[],
-    ['THE LOAD'],['Loading point',String(val('ptA')).replace(/^(📍|🗺)\s*/u,'')],['Unloading point',String(val('ptB')).replace(/^(📍|🗺)\s*/u,'')],
+    ['THE LOAD'],['Loading point',String(val('ptA')).replace(/^(📍|🗺|📌)\s*/u,'')],['Unloading point',String(val('ptB')).replace(/^(📍|🗺|📌)\s*/u,'')],
     ['Distance (km, one way)',val('lead')],['Trip time (days)',val('days')||t.days+' (estimated)'],
     ['Coming back empty on the same route',$('rtn').checked?'Yes':'No'],['Rate offered (per tonne)',val('rate')],[],
     ['RESULT'],['Cost of the trip',Math.round(t.cost)],['Breakeven rate (per tonne)',a],['Breakeven for the trip',Math.round(a*ton)]];
@@ -1424,6 +1458,7 @@ $('resetAll').onclick=()=>{
   ['ton','mil','lead','days','rate','fuel','defpc','ureaP','tyC','tyN','tyL','svcC','svcK','rep',
    'drv','toll','emi','ins','per','oth','run'].forEach(i=>{ if($(i)) $(i).value=''; });
   $('tollback').checked=false; $('tollNo').checked=true;
+  $('vno').value=''; $('load').value='';
   $('defpc').value='0.025'; $('ureaP').value='80';
   if($('rtn')) $('rtn').checked=false;
   stSel.value=''; $('fuelNote').textContent='';
