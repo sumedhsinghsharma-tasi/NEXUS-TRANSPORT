@@ -290,13 +290,6 @@ details input{font-size:16px}
 .sugg button{display:block;width:100%;text-align:left;font-family:inherit;font-size:14px;background:transparent;border:0;
   border-bottom:1px solid var(--rule);padding:9px 10px;cursor:pointer;color:var(--ink)}
 .sugg button small{display:block;color:var(--mute);font-size:11.5px}
-.mapmodal{position:fixed;inset:0;z-index:100;background:rgba(22,21,15,.55);display:flex;align-items:center;justify-content:center;padding:14px}
-.mapmodal[hidden]{display:none}
-.mapbox{background:var(--paper);border:2px solid var(--ink);width:100%;max-width:640px;padding:12px}
-.maphead{font-size:14px;margin-bottom:8px}
-.mapsearch{margin-bottom:8px;z-index:1001}.mapsearch input{width:100%;font-size:16px}
-.mapsearch .sugg{z-index:1002}
-#pickMap{height:min(55vh,420px);width:100%;border:1px solid var(--ink)}
 button.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
 .maplink{font-size:13px;font-weight:700;color:var(--ink);align-self:center}
 #routeNote:empty{display:none}
@@ -521,9 +514,7 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
         <div class="sugg" id="sugA" hidden></div></div>
       <div class="ptbtns">
         <button type="button" class="locbtn" data-loc="A">📍 Use my location</button>
-        <button type="button" class="locbtn" data-map="A">🗺 Pick on map</button>
         <button type="button" class="locbtn" data-gm="A">🔎 Find on Google Maps</button>
-        <button type="button" class="locbtn" data-paste="A">📋 Paste from Google Maps</button>
       </div>
     </div>
     <div class="ptbox">
@@ -532,12 +523,10 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
         <div class="sugg" id="sugB" hidden></div></div>
       <div class="ptbtns">
         <button type="button" class="locbtn" data-loc="B">📍 Use my location</button>
-        <button type="button" class="locbtn" data-map="B">🗺 Pick on map</button>
         <button type="button" class="locbtn" data-gm="B">🔎 Find on Google Maps</button>
-        <button type="button" class="locbtn" data-paste="B">📋 Paste from Google Maps</button>
       </div>
     </div>
-    <p class="fieldhint gmhint">Can&rsquo;t find it? Type the place and press <b>🔎 Find on Google Maps</b>. <b>Press and hold the red pin</b> (right-click it on a computer). The first line of the menu is two numbers, like <b>22.6042, 75.3025</b>. Tap them to copy, then come back to this page. It fills in by itself; if not, press <b>📋 Paste from Google Maps</b>.</p>
+    <p class="fieldhint gmhint">On Google Maps, <b>right-click the red pin</b> (press and hold on a phone) and tap the numbers to copy them, or tap the exact spot on the map. Come back here and the point fills in by itself.</p>
     <div class="btnrow" style="margin:12px 0 0">
       <button type="button" id="findDist">Find distance</button>
       <a class="maplink" id="mapLink" href="#" target="_blank" rel="noopener" hidden>See best route on Google Maps ↗</a>
@@ -701,15 +690,6 @@ footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding
   anything above it is yours. Leave trip time blank and it estimates it for you.
 </footer>
 
-</div>
-<div class="mapmodal" id="mapModal" hidden>
-  <div class="mapbox">
-    <div class="maphead"><b id="mapTitle">Tap the map to choose the point</b></div>
-    <div class="ptin mapsearch"><input id="mapQ" type="text" autocomplete="off" placeholder="Type a place, or paste numbers from Google Maps">
-      <div class="sugg" id="mapSug" hidden></div></div>
-    <div id="pickMap"></div>
-    <div class="btnrow" style="margin:10px 0 0"><button type="button" id="mapOk" disabled>Use this point</button><button type="button" class="ghost" id="mapCancel">Cancel</button></div>
-  </div>
 </div>
 <script>
 const CFG=[
@@ -1336,54 +1316,6 @@ document.querySelectorAll('[data-loc]').forEach(b=>b.onclick=()=>{
     setPoint(k,{lat,lon,label:nm||'Your location',rough:false},'📍 '+(nm||'My location'));
   },()=>routeNote('Could not get your location. Allow location access, or pick the point on the map.',true),{enableHighAccuracy:true,timeout:15000});
 });
-/* pick on map */
-let LMAP=null, LMARK=null, PICK=null, PICKK=null;
-function loadLeaflet(){
-  if(window.L) return Promise.resolve();
-  return new Promise((ok,no)=>{
-    const c=document.createElement('link'); c.rel='stylesheet'; c.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'; document.head.appendChild(c);
-    const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'; s.onload=ok; s.onerror=no; document.head.appendChild(s);
-  });
-}
-document.querySelectorAll('[data-map]').forEach(b=>b.onclick=async()=>{
-  PICKK=b.dataset.map; PICK=null; $('mapOk').disabled=true; $('mapQ').value=''; $('mapSug').hidden=true;
-  $('mapTitle').textContent=`Find the ${NAME[PICKK]} point: type it, or tap the map`;
-  $('mapModal').hidden=false;
-  try{ await loadLeaflet(); }catch(e){ $('mapModal').hidden=true; routeNote('Could not load the map. Check your internet, or type the place.',true); return; }
-  const other=PT[PICKK==='A'?'B':'A'], cur=PT[PICKK], c=cur||other;
-  if(!LMAP){
-    LMAP=L.map('pickMap').setView([22.5,78.9],5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(LMAP);
-    LMAP.on('click',e=>placeMarker(e.latlng));
-  }
-  setTimeout(()=>{ LMAP.invalidateSize(); if(c) LMAP.setView([c.lat,c.lon],cur?12:8); if(LMARK){LMAP.removeLayer(LMARK);LMARK=null;} },50);
-});
-function placeMarker(ll,zoom){ PICK=ll; if(LMARK) LMARK.setLatLng(ll); else LMARK=L.marker(ll).addTo(LMAP);
-  if(zoom) LMAP.setView(ll,zoom); $('mapOk').disabled=false; }
-(()=>{ let t=null, seq=0; const inp=$('mapQ'), box=$('mapSug');
-  inp.addEventListener('input',()=>{ clearTimeout(t); const q=inp.value.trim();
-    { const c=coordsFrom(q); if(c&&LMAP){ box.hidden=true; placeMarker({lat:c.lat,lng:c.lon},15); $('mapOk').click(); return; } }
-    if(q.length<3){ box.hidden=true; return; }
-    t=setTimeout(async()=>{ const my=++seq;
-      try{ const c=LMAP?LMAP.getCenter():null, z=LMAP?LMAP.getZoom():5, bias=c&&z>=7?`&lat=${c.lat}&lon=${c.lng}&zoom=${z}&location_bias_scale=0.3`:'';
-        const r=await fetch('https://photon.komoot.io/api/?limit=6&lang=en&bbox=68,6,98,37'+bias+'&q='+encodeURIComponent(q));
-        const j=await r.json(); if(my!==seq) return;
-        const f=(j.features||[]).filter(x=>(x.properties.countrycode||'IN')==='IN');
-        if(!f.length){ box.hidden=true; return; }
-        box.innerHTML=''; f.forEach(x=>{ const pr=x.properties, nm=pr.name||pr.city||'',
-          sub=[pr.city!==nm?pr.city:'',pr.district||pr.county,pr.state].filter(Boolean).join(', ');
-          const btn=document.createElement('button'); btn.type='button'; btn.innerHTML=`${nm}<small>${sub}</small>`;
-          btn.onclick=()=>{ box.hidden=true; inp.value=nm; if(LMAP) placeMarker({lat:x.geometry.coordinates[1],lng:x.geometry.coordinates[0]},13); };
-          box.appendChild(btn); });
-        box.hidden=false;
-      }catch(e){ box.hidden=true; } },350); });
-})();
-$('mapCancel').onclick=()=>{$('mapModal').hidden=true;};
-$('mapOk').onclick=async()=>{
-  if(!PICK) return; $('mapModal').hidden=true;
-  const lat=PICK.lat, lon=PICK.lng, nm=await placeName(lat,lon);
-  setPoint(PICKK,{lat,lon,label:nm||'Point on map',rough:false},'🗺 '+(nm||'Point on map'));
-};
 /* road distance */
 async function findDistance(){
   const qa=$('ptA').value, qb=$('ptB').value;
@@ -1419,19 +1351,10 @@ async function backFromGoogle(){
   const k=GMWAIT; let t='';
   try{ t=await navigator.clipboard.readText(); }catch(e){}
   if(t&&coordsFrom(t)){ GMWAIT=null; const inp=$('pt'+k); inp.value=t.trim(); inp.dispatchEvent(new Event('input')); }
-  else routeNote(`Copied the numbers from the red pin? Press 📋 Paste from Google Maps under the ${NAME[k]} point.`);
+  else routeNote(`Copied the numbers from the red pin? If the ${NAME[k]} point did not fill in, press and hold inside its box and choose Paste.`);
 }
 document.addEventListener('visibilitychange',backFromGoogle);
 window.addEventListener('focus',backFromGoogle);
-document.querySelectorAll('[data-paste]').forEach(b=>b.onclick=async()=>{
-  const k=b.dataset.paste, inp=$('pt'+k);
-  let t='';
-  try{ t=await navigator.clipboard.readText(); }catch(e){}
-  if(!t){ inp.focus(); routeNote('Your phone did not allow reading the copied text. Press and hold inside the box and choose Paste.',true); return; }
-  GMWAIT=null;
-  if(!coordsFrom(t)){ routeNote('What you copied is not a location from Google Maps. Copy the two numbers from the red pin, like 22.6042, 75.3025.',true); return; }
-  inp.value=t.trim(); inp.dispatchEvent(new Event('input'));
-});
 
 /* ===== Download this calculation as a spreadsheet (opens in Excel / Google Sheets) ===== */
 $('dlXls').onclick=()=>{
