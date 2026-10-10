@@ -313,13 +313,66 @@ input.miss{border-color:var(--oxide);box-shadow:0 0 0 1px var(--oxide)}
 .costcall.ok b{color:var(--moss)}
 .hints{font-size:12px;color:var(--mute);margin-top:11px;max-width:76ch;line-height:1.5}
 footer{font-size:11px;color:var(--mute);border-top:1px solid var(--rule);padding-top:12px;max-width:64ch}
+
+/* ===== Home extras: options, side panel, about page (added 9 Oct 2026) ===== */
+.newhere{font-size:22px;font-weight:900;letter-spacing:-.01em;margin:6px 0 12px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+@media(max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{font-family:inherit;text-align:left;padding:14px 15px;cursor:pointer;background:var(--paper);color:var(--ink);
+  border:2px solid var(--ink);text-decoration:none;display:block;box-shadow:3px 3px 0 var(--ink)}
+.opt:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.opt:focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
+.opt b{display:block;font-size:17px;font-weight:900;line-height:1.2}
+.opt span{display:block;font-size:13px;color:var(--mute);margin-top:4px}
+.opt.hot{background:var(--plate)}
+.opt.hot span{color:var(--ink)}
+/* floating helper panel */
+#helper{position:fixed;top:84px;right:12px;z-index:900;width:360px;max-width:calc(100vw - 24px);max-height:calc(100vh - 100px);
+  display:flex;flex-direction:column;background:var(--paper);border:2px solid var(--ink);box-shadow:5px 5px 0 var(--ink)}
+#helper[hidden]{display:none}
+.hp-head{display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--slip);padding:8px 8px 8px 12px;cursor:move;user-select:none;touch-action:none}
+.hp-title{flex:1;font-weight:900;font-size:13.5px;letter-spacing:.06em;text-transform:uppercase}
+.hp-head button{font-family:'Archivo','Noto Sans Devanagari',sans-serif;font-weight:900;font-size:12.5px;cursor:pointer;
+  background:transparent;color:var(--slip);border:1.5px solid var(--slip);padding:4px 8px;line-height:1}
+.hp-head button[aria-pressed=true]{background:var(--plate);color:var(--ink);border-color:var(--plate)}
+.hp-body{overflow:auto;padding:12px 13px 14px}
+#helper.min{width:auto}
+#helper.min .hp-body,#helper.min .hp-lang{display:none}
+.hp-note{font-size:13px;line-height:1.45;color:var(--mute);margin:0 0 10px}
+.hp-tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.hp-tbl th{text-align:left;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);padding:10px 0 4px;border-bottom:1px solid var(--ink)}
+.hp-tbl td{padding:5px 0;border-bottom:1px dotted var(--rule);vertical-align:top}
+.hp-tbl{table-layout:fixed}
+.hp-tbl td:first-child{font-family:'Archivo','Noto Sans Devanagari',sans-serif;width:56%}
+.hp-tbl td:last-child{text-align:right;font-family:'IBM Plex Mono','Noto Sans Devanagari',monospace;font-weight:600;padding-left:8px;word-break:break-word}
+.hp-ans{margin-top:12px;border:2px solid var(--ink);padding:10px 11px;font-size:13.5px;line-height:1.45}
+.hp-ans b{font-size:16px}
+.hp-ans .loss{color:var(--oxide)}
+.hp-vid{background:var(--ink);border:2px solid var(--ink)}
+.hp-vid video{display:block;width:100%;height:auto;max-height:calc(100vh - 140px)}
+@media(max-width:600px){
+  #helper{width:58vw;max-height:50vh;top:96px;right:8px}
+  #helper.vid{width:52vw}
+  .hp-tbl{font-size:12px}.hp-ans{font-size:12px}.hp-ans b{font-size:14px}
+  .hp-title{font-size:11.5px}
+}
+html[lang=hi] .hp-body,.hp-body.hi{font-family:'Noto Sans Devanagari','Archivo',sans-serif}
+/* about page */
+#segAbout .hblock{background:var(--paper);border:2px solid var(--ink);padding:18px;margin:0 0 18px}
+#segAbout h2{border:0;margin:0 0 12px;padding:0}
+#segAbout p{font-size:15.5px;line-height:1.6;margin:0 0 12px;max-width:62ch}
+.aboutsig{font-weight:900}
+.aboutnav{display:flex;gap:10px;flex-wrap:wrap}
+.aboutnav button,.aboutnav a{font-family:'Archivo',sans-serif;font-size:13px;font-weight:900;background:var(--ink);color:var(--slip);
+  border:2px solid var(--ink);padding:10px 14px;cursor:pointer;text-decoration:none}
+.aboutnav .ghostb{background:transparent;color:var(--ink)}
 </style>
 <script>
 !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags identify setPersonProperties reset get_distinct_id get_session_id startSessionRecording stopSessionRecording captureException opt_in_capturing opt_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
 posthog.init('phc_u2mRRFwSFgDuu4z6n8vMpXtNumZ2C62ZAWEH5PAiRvok',{api_host:'https://us.i.posthog.com',person_profiles:'identified_only'});
 document.addEventListener('click',function(e){
-  var names={goCalc:'trip_calculated',findDist:'distance_found',svcDl:'excel_downloaded',dAdd:'document_added',eAdd:'ewaybill_added',locBtn:'help_nearby_used'};
-  var b=e.target.closest?e.target.closest('button[id]'):null;
+  var names={optAbout:'about_opened',pressLink:'motorindia_clicked',goCalc:'trip_calculated',findDist:'distance_found',svcDl:'excel_downloaded',dAdd:'document_added',eAdd:'ewaybill_added',locBtn:'help_nearby_used'};
+  var b=e.target.closest?e.target.closest('button[id],a[id]'):null;
   if(b&&names[b.id]&&window.posthog){window.posthog.capture(names[b.id]);}
 },true);
 </script></head>
@@ -365,8 +418,42 @@ document.addEventListener('click',function(e){
   </div>
   <div class="road"></div>
 </div>
+
+<div class="newhere">New here?</div>
+<div class="opts">
+  <button type="button" class="opt hot" id="optSample"><b>See a sample trip</b><span>A filled example opens on the side. Copy it into the calculator at your own pace.</span></button>
+  <button type="button" class="opt" id="optVideo"><b>Watch how to use it</b><span>1-minute video, &#2361;&#2367;&#2306;&#2342;&#2368; / English. Plays on the side while you fill.</span></button>
+  <button type="button" class="opt" id="optAbout"><b>Why we built this</b><span>About us: a truck owner&rsquo;s story.</span></button>
+  <a class="opt" id="pressLink" href="https://www.motorindiaonline.in/the-transporter-who-turned-his-losses-into-a-calculator/" target="_blank" rel="noopener"><b>In the news &#8599;</b><span>MOTORINDIA: &ldquo;The Transporter Who Turned His Losses into a Calculator&rdquo;</span></a>
+</div>
 </div>
 
+<div id="segAbout" hidden>
+  <div class="hblock">
+    <h2>Why we built this</h2>
+    <p>I am Sumedh. For six years I have run trucks for UltraTech Cement. At one time we had 117 trucks at 7 plants. Today we have 43.</p>
+    <p>Every month our accounts looked fine. When I finally sat down and worked out the cost of each trip, we were making money at only 2 plants out of 7. Diesel, tyres, tolls, EMI and the empty trip back were eating the freight, and nobody told us.</p>
+    <p>Nobody tells a truck owner this. The broker, the financier and the dealer all get paid when the truck moves, whether the owner makes money or not.</p>
+    <p>So I built NEXUS for owners like me. Put in the trip before you take the load, and see if it pays.</p>
+    <p class="aboutsig">Sumedh Singh Sharma, founder</p>
+  </div>
+  <div class="aboutnav">
+    <button type="button" id="aboutCalc">Open the profit calculator</button>
+    <button type="button" class="ghostb" id="aboutHome">Back to Home</button>
+  </div>
+</div>
+
+
+
+<div id="helper" hidden role="dialog" aria-label="Help panel">
+  <div class="hp-head" id="hpHead">
+    <span class="hp-title" id="hpTitle">Sample trip</span>
+    <span class="hp-lang"><button type="button" data-hl="hi" aria-pressed="true">&#2361;&#2367;&#2306;</button> <button type="button" data-hl="en" aria-pressed="false">EN</button></span>
+    <button type="button" id="hpMin" aria-label="Make small">&ndash;</button>
+    <button type="button" id="hpClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="hp-body" id="hpBody"></div>
+</div>
 <div id="segRate">
   <div class="panel" style="margin-bottom:12px">
   <div class="grid gtop">
@@ -1185,6 +1272,7 @@ let SEG='home', SUB={rate:'one', comp:'di'}, TRUCKOPEN=false;
 function truckSummary(){ /* the bar stays a plain prompt */ }
 function paint(){
   $('segHome').hidden = SEG!=='home';
+  $('segAbout').hidden = SEG!=='about';
   $('goHome').setAttribute('aria-pressed',SEG==='home');
   $('segRate').hidden = SEG!=='rate';
   $('rateNote').hidden = SEG!=='rate';
@@ -1441,6 +1529,96 @@ sel.onchange=seed;
   .forEach(i=>$(i).addEventListener('input',()=>{TOUCHED.add(i);calc();}));
 ['tollback','tollNo'].forEach(i=>$(i).addEventListener('change',calc));
 seed(); drawDocs(); drawEwb(); paint();
+
+/* ===== Home extras: side panel (sample / video), about page (added 9 Oct 2026) ===== */
+const HP={mode:null,lang:'hi'};
+const SAMPLE_ROWS=[
+ ['h','Trip','ट्रिप'],
+ ['What you carry','क्या ले जा रहे हैं','Cement'],
+ ['Truck','ट्रक','22 tyre'],
+ ['Tonnes','टन','41'],
+ ['Average (km per litre)','एवरेज (किमी प्रति लीटर)','2.8'],
+ ['h','Fuel','डीज़ल'],
+ ['Your state','आपका राज्य','Madhya Pradesh'],
+ ['Diesel per litre','डीज़ल प्रति लीटर','auto / अपने आप'],
+ ['DEF / Urea, urea price','DEF / यूरिया, यूरिया रेट','0.025 · ₹80'],
+ ['h','Tyres','टायर'],
+ ['One tyre costs','एक टायर की कीमत','₹26,000'],
+ ['How many tyres','कितने टायर','22'],
+ ['A tyre lasts','टायर कितने किमी चलता है','75,000 km'],
+ ['h','Service and repairs','सर्विस और रिपेयर'],
+ ['One service costs','एक सर्विस का खर्च','₹45,000'],
+ ['Service every','सर्विस हर','75,000 km'],
+ ['Repairs in a month','महीने का रिपेयर','₹15,000'],
+ ['h','Every trip','हर ट्रिप'],
+ ['Driver and advance','ड्राइवर और एडवांस','₹4,550'],
+ ['Toll per km','प्रति किमी टोल','₹7'],
+ ['Toll reimbursed?','टोल वापस मिलता है?','No / नहीं'],
+ ['Office expense per trip','प्रति ट्रिप ऑफिस खर्च','₹2,200'],
+ ['h','Paid whether the truck moves or not','ट्रक चले या न चले, ये खर्च'],
+ ['EMI in a month','महीने की EMI','₹1,00,000'],
+ ['Insurance in a year','साल का बीमा','₹80,000'],
+ ['Permit, tax, fitness (year)','परमिट, टैक्स, फिटनेस (साल)','₹44,000'],
+ ['Days you run in a month','महीने में कितने दिन चलती है','26'],
+ ['h','The load','लोड'],
+ ['Distance A to B','दूरी A से B','500 km'],
+ ['Trip time','ट्रिप का समय','leave blank / खाली छोड़ें'],
+ ['Rate offered per tonne','प्रति टन ऑफर भाड़ा','₹1,000'],
+ ['Coming back empty?','खाली वापस?','No / नहीं'],
+];
+function hpRender(){
+  const L=HP.lang, hi=L==='hi', body=$('hpBody');
+  body.classList.toggle('hi',hi);
+  document.querySelectorAll('[data-hl]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.hl===L));
+  $('helper').classList.toggle('vid',HP.mode==='video');
+  if(HP.mode==='sample'){
+    $('hpTitle').textContent = hi?'नमूना':'Sample';
+    let rows='';
+    SAMPLE_ROWS.forEach(r=>{
+      if(r[0]==='h') rows+=`<tr><th colspan="2">${hi?r[2]:r[1]}</th></tr>`;
+      else { const val=r[2].includes(' / ')?r[2].split(' / ')[hi?1:0]:r[2]; rows+=`<tr><td>${hi?r[1]:r[0]}</td><td>${val}</td></tr>`; }
+    });
+    body.innerHTML = `<p class="hp-note">${hi
+      ?'ये एक नमूना है, आपके आंकड़े नहीं। इन्हें कैलकुलेटर में भरकर देखें, या सीधे अपने आंकड़े डालें।'
+      :'This is a sample, not your numbers. Copy these into the calculator to see how it works, or put in your own.'}</p>
+      <table class="hp-tbl">${rows}</table>
+      <div class="hp-ans">${hi
+      ?'जवाब आएगा: <b class="loss">घाटा ₹1,867</b><br>खर्च निकालने के लिए कम से कम <b>₹1,046 प्रति टन</b> माँगें।'
+      :'You should get: <b class="loss">Loss ₹1,867</b><br>Quote at least <b>₹1,046 a tonne</b> to cover the costs.'}</div>`;
+  } else if(HP.mode==='video'){
+    $('hpTitle').textContent = hi?'वीडियो':'Video';
+    const cur=body.querySelector('video');
+    if(!cur || !cur.src.includes('-'+L+'.mp4')){
+      body.innerHTML=`<div class="hp-vid"><video id="demoVid" controls playsinline preload="metadata" poster="nexus-demo-${L}.jpg" src="nexus-demo-${L}.mp4"></video></div>`;
+      $('demoVid').addEventListener('play',()=>{ if(window.posthog) posthog.capture('demo_video_played',{lang:L}); });
+    }
+  }
+}
+function openHelper(mode){
+  HP.mode=mode; const h=$('helper');
+  h.hidden=false; h.classList.remove('min'); h.style.left=''; h.style.top=''; h.style.right='';
+  hpRender();
+  SEG='rate'; TRUCKOPEN=false; paint(); goTop();
+  if(window.posthog) posthog.capture(mode==='sample'?'sample_opened':'video_opened');
+}
+$('optSample').onclick=()=>openHelper('sample');
+$('optVideo').onclick=()=>openHelper('video');
+$('hpClose').onclick=()=>{ const v=$('hpBody').querySelector('video'); if(v) v.pause(); $('helper').hidden=true; };
+$('hpMin').onclick=()=>{ const h=$('helper'); h.classList.toggle('min'); $('hpMin').innerHTML=h.classList.contains('min')?'+':'&ndash;';
+  const v=$('hpBody').querySelector('video'); if(v&&h.classList.contains('min')) v.pause(); };
+document.querySelectorAll('[data-hl]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); HP.lang=b.dataset.hl; hpRender(); });
+/* drag the panel by its dark bar */
+{ const h=$('helper'), hd=$('hpHead'); let sx,sy,ox,oy,drag=false;
+  hd.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; drag=true; const r=h.getBoundingClientRect();
+    sx=e.clientX; sy=e.clientY; ox=r.left; oy=r.top; hd.setPointerCapture(e.pointerId); });
+  hd.addEventListener('pointermove',e=>{ if(!drag) return; const r=h.getBoundingClientRect();
+    const x=Math.min(Math.max(0,ox+e.clientX-sx),innerWidth-r.width), y=Math.min(Math.max(0,oy+e.clientY-sy),innerHeight-40);
+    h.style.left=x+'px'; h.style.top=y+'px'; h.style.right='auto'; });
+  hd.addEventListener('pointerup',()=>{drag=false;}); }
+/* about page */
+$('optAbout').onclick=()=>{ SEG='about'; paint(); goTop(); };
+$('aboutCalc').onclick=()=>{ SEG='rate'; paint(); goTop(); };
+$('aboutHome').onclick=()=>{ SEG='home'; paint(); goTop(); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script src="/nexus-tracking.js"></script>      
